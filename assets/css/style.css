@@ -1,0 +1,337 @@
+/* ─────────────────────────────────────────
+   NexAdopt – style.css
+   ───────────────────────────────────────── */
+
+:root {
+  --c1: #f4eee2;   /* crema fondo */
+  --c2: #cee2e1;   /* verde agua claro */
+  --c3: #afc1c1;   /* verde agua medio */
+  --c4: #507580;   /* azul-verde oscuro (Color EXACTO del fondo del logo) */
+  --c5: #c24e35;   /* coral/acento */
+  --header-bg: #aec0c1; /* color del header */
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Work Sans', Arial, sans-serif;
+  background: var(--c1);
+  color: var(--c4);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+/* ───────── HEADER ───────── */
+.site-header {
+  background: var(--header-bg);
+  border-bottom: 2px solid var(--c3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  /* ¡NUEVO! Animación suave de 0.3 segundos para cuando aparezca/desaparezca */
+  transition: transform 0.3s ease-in-out; 
+}
+
+/* ¡NUEVO! Esta clase se la pondremos con JavaScript para esconder el header */
+.site-header.header-hidden {
+  transform: translateY(-100%);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.logo-wrap img {
+  height: 85px;
+  width: auto;
+}
+
+.site-header nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.site-header nav a {
+  text-decoration: none;
+  color: var(--c4);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.45);
+  border-color: rgba(83, 121, 134, 0.2);
+}
+
+.site-header nav a:hover {
+  background: #fff;
+  border-color: var(--c4);
+  color: var(--c4);
+}
+
+.site-header nav a.active {
+  background: var(--c4);
+  color: #fff;
+  border-color: var(--c4);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.btn-donar {
+  background: var(--c5);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.4rem;
+  border-radius: 999px;
+  font-family: 'Work Sans', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+  box-shadow: 0 2px 8px rgba(194, 78, 53, 0.25);
+}
+
+.btn-donar:hover {
+  background: #a83e28;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(194, 78, 53, 0.35);
+}
+
+.btn-profile {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  border: 1.5px solid rgba(83, 121, 134, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  color: var(--c4);
+  text-decoration: none;
+}
+
+.btn-profile:hover {
+  background: var(--c4);
+  color: #fff;
+  transform: scale(1.07);
+}
+
+/* ───────── FOOTER ───────── */
+.site-footer {
+  background: var(--c4); 
+  color: var(--c1);
+  padding: 3rem 2rem 2rem;
+  margin-top: auto;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.footer-logo-top {
+  width: 130px; 
+  height: auto; 
+  object-fit: contain;
+  align-self: flex-start;
+  opacity: 1;
+  filter: none;
+}
+
+.footer-social {
+  display: flex;
+  flex-direction: row;
+  gap: 0.6rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--c1);
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.social-link:hover {
+  background: var(--c5);
+  transform: scale(1.1);
+  color: #fff;
+}
+
+/* Columnas de enlaces */
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.footer-col {
+  text-align: left;
+}
+
+.footer-col h4 {
+  font-family: 'Work Sans', Arial, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--c2);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0;
+}
+
+.footer-col ul li a {
+  text-decoration: none;
+  color: rgba(244, 238, 226, 0.78);
+  font-size: 0.88rem;
+  font-weight: 400;
+  transition: color 0.2s;
+  display: inline-block;
+}
+
+.footer-col ul li a:hover {
+  color: #fff;
+}
+
+.footer-bottom {
+  max-width: 1100px;
+  margin: 2rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.footer-bottom span {
+  font-size: 0.8rem;
+  color: rgba(244, 238, 226, 0.45);
+}
+
+.footer-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  opacity: 1;
+  filter: none;
+}
+
+/* ─────────────────────────────────────────
+   PÁGINA DE INICIO (INDEX.PHP)
+   ───────────────────────────────────────── */
+
+/* Textos y fondos usando tus variables */
+.text-brand { color: var(--c4) !important; }
+.text-accent { color: var(--c5) !important; }
+.bg-crema { background-color: var(--c1) !important; }
+.bg-verde-claro { background-color: var(--c2) !important; }
+
+/* Botón principal (Azul-verde oscuro) */
+.btn-nexadopt {
+  background: var(--c4);
+  color: var(--c1);
+  border: none;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+}
+.btn-nexadopt:hover {
+  background: #3d5961; /* Un tono un poco más oscuro que c4 */
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(80, 117, 128, 0.3);
+}
+
+/* Botón secundario (Borde) */
+.btn-outline-nexadopt {
+  border: 2px solid var(--c4);
+  color: var(--c4);
+  background: transparent;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+}
+.btn-outline-nexadopt:hover {
+  background: var(--c4);
+  color: var(--c1);
+}
+
+/* Cajas de iconos interactivas */
+.icon-box {
+  background: #fff;
+  border: 2px solid var(--c2) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.icon-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(80, 117, 128, 0.15) !important;
+  border-color: var(--c3) !important;
+}
+.icon-circle {
+  background: var(--c2);
+  color: var(--c4);
+}
+
+/* Tarjetas (Cards) */
+.card-nexadopt {
+  border: 1px solid var(--c2);
+  transition: border-color 0.3s;
+}
+.card-nexadopt:hover {
+  border-color: var(--c4);
+}
