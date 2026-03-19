@@ -9,7 +9,7 @@ require_once '../config/conexion.php';
 $mensaje = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Recogemos datos
+    // Recogemos datos del formulario
     $nombre      = $_POST['nombre'];
     $especie     = $_POST['especie'];
     $raza        = $_POST['raza'];
@@ -19,29 +19,68 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $tamanio     = $_POST['tamanio'];
     $descripcion = $_POST['descripcion'];
 
-    // Gestión de la FOTO
-    $foto_nombre = $_FILES['foto']['name'];
-    $ruta_temporal = $_FILES['foto']['tmp_name'];
-    $carpeta_destino = "../assets/img/mascotas/";
     
-    // Creamos un nombre único para la foto para que no se sobreescriban
-    $foto_final = time() . "_" . $foto_nombre;
+    
+    // Limpiamos el nombre de la mascota para usarlo en la carpeta (quitamos espacios y caracteres raros)
+    $nombre_limpio = preg_replace('/[^a-zA-Z0-9]/', '', $nombre);
+    
+    // Creamos el nombre de la carpeta: Nombre + Tiempo (para evitar duplicados si hay dos perros llamados igual)
+    $nombre_carpeta = $nombre_limpio . "_" . time();
+    $ruta_carpeta_destino = "../assets/img/mascotas/" . $nombre_carpeta . "/";
 
-    if (move_uploaded_file($ruta_temporal, $carpeta_destino . $foto_final)) {
-        // Insertamos en la base de datos (Usando tus columnas exactas)
+    // Creamos la carpeta físicamente en el servidor si no existe
+    if (!file_exists($ruta_carpeta_destino)) {
+        mkdir($ruta_carpeta_destino, 0777, true);
+    }
+
+    $foto_principal = "";
+    $fotos_subidas_count = 0;
+    
+    // Contamos cuántas fotos ha subido el usuario
+    $total_fotos = count($_FILES['fotos']['name']);
+    
+    // Limitamos a un máximo de 10 fotos
+    if ($total_fotos > 10) {
+        $total_fotos = 10;
+    }
+
+    // Recorremos todas las fotos subidas
+    for ($i = 0; $i < $total_fotos; $i++) {
+        $foto_nombre = $_FILES['fotos']['name'][$i];
+        $ruta_temporal = $_FILES['fotos']['tmp_name'][$i];
+
+        if ($ruta_temporal != "") {
+            // Generamos un nombre seguro para cada foto (ej: foto_1_171098.jpg)
+            $extension = pathinfo($foto_nombre, PATHINFO_EXTENSION);
+            $nuevo_nombre_foto = "foto_" . ($i + 1) . "_" . time() . "." . $extension;
+            $ruta_final_foto = $ruta_carpeta_destino . $nuevo_nombre_foto;
+
+            // Movemos la foto a su nueva carpeta
+            if (move_uploaded_file($ruta_temporal, $ruta_final_foto)) {
+                // Si es la PRIMERA foto (índice 0), la guardamos como foto principal para la Base de Datos
+                if ($i == 0) {
+                    $foto_principal = $nombre_carpeta . "/" . $nuevo_nombre_foto;
+                }
+                $fotos_subidas_count++;
+            }
+        }
+    }
+
+    // Si al menos se ha subido 1 foto con éxito, insertamos en BD
+    if ($fotos_subidas_count > 0) {
         $sql = "INSERT INTO Mascotas (id_usuario_alta, nombre, especie, raza, edad_valor, edad_unidad, sexo, tamanio, descripcion, foto_url, estado) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Disponible')";
         
         $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("isssisssss", $_SESSION['id_usuario'], $nombre, $especie, $raza, $edad_valor, $edad_unidad, $sexo, $tamanio, $descripcion, $foto_final);
+        $stmt->bind_param("isssisssss", $_SESSION['id_usuario'], $nombre, $especie, $raza, $edad_valor, $edad_unidad, $sexo, $tamanio, $descripcion, $foto_principal);
 
         if ($stmt->execute()) {
-            $mensaje = '<div class="alert alert-success">¡Mascota añadida correctamente!</div>';
+            $mensaje = '<div class="alert alert-success">¡Mascota añadida correctamente con ' . $fotos_subidas_count . ' fotos!</div>';
         } else {
             $mensaje = '<div class="alert alert-danger">Error al guardar en BD: ' . $conexion->error . '</div>';
         }
     } else {
-        $mensaje = '<div class="alert alert-danger">Error al subir la foto. Revisa los permisos de la carpeta.</div>';
+        $mensaje = '<div class="alert alert-danger">Error: Debes subir al menos 1 foto válida.</div>';
     }
 }
 
@@ -107,8 +146,9 @@ include '../includes/header_admin.php';
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-bold">Foto de la mascota</label>
-                            <input type="file" name="foto" class="form-control" accept="image/*" required>
+                            <label class="form-label fw-bold">Fotos de la mascota (Hasta 10 imágenes)</label>
+                            <input type="file" name="fotos[]" class="form-control" accept="image/*" multiple required>
+                            <small class="text-muted">Mantén pulsada la tecla CTRL para seleccionar varias fotos a la vez en tu ordenador.</small>
                         </div>
 
                         <div class="col-12 mt-4 text-end">

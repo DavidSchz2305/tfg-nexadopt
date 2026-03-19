@@ -34,7 +34,7 @@ include 'includes/header.php';
                 </div></div>
 
                 <div class="col"><div class="icon-box text-center p-3 rounded-4 h-100">
-                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">💳</div>
+                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">❤️</div>
                     <h5 class="fw-semibold text-brand mb-1">Cuidados y salud</h5>
                     <p class="small mb-0" style="color: #6a828a;">Garantizamos el bienestar animal</p>
                 </div></div>
@@ -46,7 +46,7 @@ include 'includes/header.php';
                 </div></div>
 
                 <div class="col"><div class="icon-box text-center p-3 rounded-4 h-100">
-                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">❤️</div>
+                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">💳</div>
                     <h5 class="fw-semibold text-brand mb-1">Haz tu donativo</h5>
                     <p class="small mb-0" style="color: #6a828a;">Ayúdanos a salvar vidas</p>
                 </div></div>

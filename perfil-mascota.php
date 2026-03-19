@@ -3,7 +3,6 @@ session_start();
 include 'includes/header.php';
 require_once 'config/conexion.php';
 
-
 // RECOGER EL ID DE LA MASCOTA
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: adoptar.php");
@@ -39,8 +38,34 @@ if ($mascota['estado'] == 'En proceso') {
     $puede_adoptar = false; 
 }
 
-// Definimos la ruta de la foto principal
-$foto_principal = "assets/img/mascotas/" . htmlspecialchars($mascota['foto_url']);
+/* Cogemos los datos de la carpeta que se ha generado con el nombre*/
+
+$foto_db = $mascota['foto_url'];
+$ruta_base = "assets/img/mascotas/";
+$fotos_galeria = [];
+
+// Verificamos si la foto guardada está dentro de una carpeta (tiene una barra '/')
+if (strpos($foto_db, '/') !== false) {
+    $carpeta = dirname($foto_db); // Extrae el nombre de la carpeta (ej: "Lia_12345")
+    $ruta_directorio = $ruta_base . $carpeta . "/";
+    
+    // Escaneamos la carpeta buscando todas las imágenes
+    if (is_dir($ruta_directorio)) {
+        // glob() busca archivos que coincidan con la extensión
+        $archivos = glob($ruta_directorio . "*.{jpg,jpeg,png,webp,gif}", GLOB_BRACE);
+        foreach ($archivos as $archivo) {
+            $fotos_galeria[] = $archivo;
+        }
+    }
+}
+
+// Si la carpeta está vacía o es una mascota antigua sin carpeta, usamos la foto por defecto
+if (empty($fotos_galeria)) {
+    $fotos_galeria[] = $ruta_base . htmlspecialchars($foto_db);
+}
+
+// La primera foto de la carpeta será siempre la principal
+$foto_principal = $fotos_galeria[0];
 ?>
 
 <main class="site-main bg-crema py-5">
@@ -59,29 +84,18 @@ $foto_principal = "assets/img/mascotas/" . htmlspecialchars($mascota['foto_url']
                 </div>
 
                 <div class="position-sticky" style="top: 100px;">
-                    <a href="<?= $foto_principal ?>" data-fslightbox="mascota-galeria" data-title="Foto principal de <?= htmlspecialchars($mascota['nombre']) ?>">
-                        <img src="<?= $foto_principal ?>" 
-                             alt="<?= htmlspecialchars($mascota['nombre']) ?>" 
-                             class="img-fluid rounded-4 shadow-sm w-100 object-fit-cover border border-c2 mb-3 cursor-zoom-in" 
-                             style="max-height: 500px;">
+                    <a href="<?= $foto_principal ?>" data-fslightbox="mascota-galeria">
+                        <img src="<?= $foto_principal ?>" alt="<?= htmlspecialchars($mascota['nombre']) ?>" class="img-fluid rounded-4 shadow-sm w-100 object-fit-cover border border-c2 mb-3 cursor-zoom-in" style="max-height: 500px;">
                     </a>
 
                     <div class="row g-2">
-                        <div class="col-4">
-                            <a href="<?= $foto_principal ?>" data-fslightbox="mascota-galeria" data-title="Vista 1 de <?= htmlspecialchars($mascota['nombre']) ?>">
-                                <img src="<?= $foto_principal ?>" alt="" class="img-fluid rounded-3 shadow-sm w-100 galeria-miniatura">
-                            </a>
-                        </div>
-                        <div class="col-4">
-                            <a href="<?= $foto_principal ?>" data-fslightbox="mascota-galeria" data-title="Vista 2 de <?= htmlspecialchars($mascota['nombre']) ?>">
-                                <img src="<?= $foto_principal ?>" alt="" class="img-fluid rounded-3 shadow-sm w-100 galeria-miniatura opacity-75">
-                            </a>
-                        </div>
-                        <div class="col-4">
-                            <a href="<?= $foto_principal ?>" data-fslightbox="mascota-galeria" data-title="Vista 3 de <?= htmlspecialchars($mascota['nombre']) ?>">
-                                <img src="<?= $foto_principal ?>" alt="" class="img-fluid rounded-3 shadow-sm w-100 galeria-miniatura opacity-75">
-                            </a>
-                        </div>
+                        <?php foreach($fotos_galeria as $index => $ruta_foto): ?>
+                            <div class="col-4">
+                                <a href="<?= $ruta_foto ?>" data-fslightbox="mascota-galeria">
+                                    <img src="<?= $ruta_foto ?>" alt="Vista <?= $index+1 ?>" class="img-fluid rounded-3 shadow-sm w-100 galeria-miniatura <?= ($index == 0) ? '' : 'opacity-75' ?>" style="height: 120px; object-fit: cover;">
+                                </a>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
