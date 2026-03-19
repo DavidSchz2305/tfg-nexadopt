@@ -411,3 +411,35 @@ body.admin-body {
     transform: translateY(-3px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
+
+
+/* ====================== ESTILOS PARA PERFIL DE MASCOTA ================================= */
+
+.hover-brand {
+    transition: color 0.3s ease;
+}
+
+.hover-brand:hover { 
+    color: var(--c2) !important; 
+}
+
+/* Ajuste para que los bordes en la ficha técnica se vean bien en móvil y PC */
+@media (min-width: 576px) {
+    .border-sm-bottom-0 { 
+        border-bottom: none !important; 
+    }
+}
+
+/* Estilos para la galería de imágenes del perfil */
+.galeria-miniatura {
+    height: 120px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.galeria-miniatura:hover {
+    transform: scale(1.03);
+    border-color: var(--c2);
+}
