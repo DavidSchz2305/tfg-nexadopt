@@ -271,9 +271,7 @@ main {
   filter: none;
 }
 
-/* ─────────────────────────────────────────
-   PÁGINA DE INICIO (INDEX.PHP)
-   ───────────────────────────────────────── */
+/* ========== PÁGINA DE INICIO (INDEX.PHP) =================== */
 
 /* Textos y fondos usando tus variables */
 .text-brand { color: var(--c4) !important; }
@@ -334,4 +332,82 @@ main {
 }
 .card-nexadopt:hover {
   border-color: var(--c4);
+}
+
+/* ========================================================================= */
+/* ESTILOS DEL PANEL DE ADMINISTRADOR (DASHBOARD)
+/* ========================================================================= */
+
+:root {
+    --sidebar-width: 260px;
+}
+
+body.admin-body {
+    background-color: #f8f9fa;
+    font-family: 'Work Sans', sans-serif;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    background-color: #507580; /* Tu verde oscuro */
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.sidebar-brand {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: 0.2s;
+    margin: 0.2rem 1rem;
+    border-radius: 8px;
+}
+
+.sidebar-nav a:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.sidebar-nav a.active {
+    background: #c24e35; /* Tu naranja/terracota */
+    color: white;
+    font-weight: 600;
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .sidebar { margin-left: calc(-1 * var(--sidebar-width)); }
+    .main-content { margin-left: 0; }
+}
+
+
+/* EFECTOS DEL PANEL DE ADMINISTRACIÓN */
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+.hover-shadow:hover {
+    background-color: #f1f3f4 !important;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
