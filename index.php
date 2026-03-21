@@ -66,9 +66,7 @@ include 'includes/header.php';
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="mb-4">
-                        <div class="d-inline-block p-2 rounded-circle mb-3 bg-crema" style="width: 70px; height: 70px; border: 2px solid var(--c3);">
-                            <img src="assets/img/header_footer/logo_footer.png" alt="NexAdopt Logo" class="img-fluid" style="max-height: 45px; margin-top: 2px;" loading="lazy">
-                        </div>
+                            <img src="assets/img/header_footer/logo_transparente.png" alt="NexAdopt Logo" class="img-fluid" style="max-height: 45px; margin-top: 2px;" loading="lazy">
                         <h2 class="display-5 fw-bold text-brand">¿Quiénes somos?</h2>
                     </div>
                     <p class="lead mb-4 px-lg-5" style="color: #4a5d63;">Somos una plataforma digital innovadora dedicada a transformar el proceso de adopción animal. NexAdopt une el esfuerzo incansable de protectoras y refugios con personas comprometidas, garantizando adopciones responsables, seguras y transparentes para que cada animal reciba el hogar que merece.</p>

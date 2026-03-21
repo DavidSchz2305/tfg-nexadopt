@@ -109,7 +109,7 @@ $foto_principal = $fotos_galeria[0];
                 <p class="fs-5 text-muted mb-4">Estoy buscando mi hogar para siempre. ¿Podrías ser mi familia perfecta?</p>
 
                 <div class="mb-4 p-4 bg-white rounded-4 shadow-sm border-start border-c2 border-5">
-                    <h5 class="fw-bold text-brand mb-3"><span class="me-2">📖</span>La historia de <?= htmlspecialchars($mascota['nombre']) ?></h5>
+                    <h5 class="fw-bold text-brand mb-3"><span class="me-2"></span>La historia de <?= htmlspecialchars($mascota['nombre']) ?></h5>
                     <div class="text-dark lh-lg" style="white-space: pre-wrap; font-size: 1.05rem;"><?= htmlspecialchars($mascota['descripcion']) ?></div>
                 </div>
 

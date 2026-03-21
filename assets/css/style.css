@@ -309,6 +309,66 @@ main {
   color: var(--c1);
 }
 
+/* Mejora de espaciado y legibilidad en página Colabora */
+.collaboration-cards .card {
+  border: 1px solid rgba(80, 117, 128, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.collaboration-cards .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12);
+}
+
+.collaboration-cards .card-body {
+  padding: 1.3rem 1.25rem 1.4rem;
+  line-height: 1.65;
+}
+
+.collaboration-cards .card-title {
+  font-size: 1.35rem;
+  letter-spacing: 0.01em;
+}
+
+.collaboration-cards .card-text {
+  font-size: 1.02rem;
+  margin-bottom: 1rem;
+  color: #41515a;
+}
+
+.collaboration-cards .card-text, .collaboration-cards .small,
+.collaboration-cards .alert {
+  line-height: 1.6;
+}
+
+.collaboration-cards .alert {
+  background: #fff;
+  border: 1px solid rgba(245, 221, 137, 0.5);
+  border-radius: 0.7rem;
+}
+
+.collaboration-cards .card-body p {
+  margin-bottom: 0.85rem;
+}
+
+.collaboration-cards .badge {
+  min-width: 2.05rem;
+  font-size: 0.9rem;
+}
+
+.collaboration-cards .btn {
+  padding: 0.65rem 1rem;
+}
+
+/* Ajustes en móviles para mejor lectura */
+@media (max-width: 767px) {
+  .collaboration-cards .card-body {
+    padding: 1rem;
+  }
+  .collaboration-cards .card-title {
+    font-size: 1.2rem;
+  }
+}
+
 /* Cajas de iconos interactivas */
 .icon-box {
   background: #fff;
