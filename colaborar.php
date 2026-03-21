@@ -119,7 +119,7 @@ include 'includes/header.php';
                                 </ul>
                             </div>
 
-                            <a href="donar.php" class="btn btn-dark btn-lg mt-auto w-100 rounded-3" style="font-weight: 500;">
+                            <a href="pages/donar.php" class="btn btn-dark btn-lg mt-auto w-100 rounded-3" style="font-weight: 500;">
                                 Hacer transferencia
                             </a>
                         </div>

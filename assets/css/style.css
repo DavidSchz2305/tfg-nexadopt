@@ -503,3 +503,78 @@ body.admin-body {
     transform: scale(1.03);
     border-color: var(--c2);
 }
+
+/* ============================== ESTILOS EXCLUSIVOS PARA LA PÁGINA DE DONAR ==================================== */
+
+/* Contenedor de inputs numéricos */
+.donar-input-group .form-control:focus {
+    box-shadow: none;
+    border-color: var(--c4) !important;
+}
+
+.border-brand {
+    border-color: var(--c3) !important;
+}
+
+/* --- BOTONES SELECCIONABLES (Tipos, Cantidades, Métodos) --- */
+.donar-radio {
+    border: 2px solid var(--c3);
+    background-color: #ffffff;
+    color: var(--c4);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.donar-radio:hover {
+    border-color: var(--c4);
+    transform: translateY(-2px);
+}
+
+/* ESTADO SELECCIONADO: Fondo oscuro (c4) y texto blanco */
+.btn-check:checked + .donar-radio {
+    background-color: var(--c4);
+    border-color: var(--c4);
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(80, 117, 128, 0.25);
+}
+
+/* Fuerza a los textos e iconos internos a ser blancos al seleccionar */
+.btn-check:checked + .donar-radio *,
+.btn-check:checked + .donar-radio i {
+    color: #ffffff !important;
+}
+
+/* --- BOTÓN DONAR FINAL --- */
+.btn-donar-action {
+    background-color: var(--c5);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-donar-action:hover {
+    background-color: #a83e28;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(194, 78, 53, 0.3);
+    color: white;
+}
+
+/* --- TARJETAS "TU IMPACTO" --- */
+.donar-impact-card {
+    background: #ffffff;
+    border: 1px solid var(--c2);
+    border-top: 4px solid var(--c5); /* Línea superior coral para resaltar */
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.donar-impact-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(80, 117, 128, 0.15) !important;
+    border-color: var(--c3);
+}
+
+/* Panel resumen lateral */
+.donar-summary-card {
+    border: 1px solid var(--c2);
+}

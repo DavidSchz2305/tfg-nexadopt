@@ -2,7 +2,7 @@
   <div class="footer-inner">
 
     <div class="footer-brand">
-      <img src="assets/img/header_footer/logo_footer.png" alt="NexAdopt" class="footer-logo-top" />
+      <img src="<?php echo $base_url; ?>assets/img/header_footer/logo_footer.png" alt="NexAdopt" class="footer-logo-top" />
       <div class="footer-social">
         <a class="social-link" href="#" title="Instagram">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -28,34 +28,34 @@
       <div class="footer-col">
         <h4>Navegación</h4>
         <ul>
-          <li><a href="index.php">Inicio</a></li>
-          <li><a href="adoptar.php">Adoptar</a></li>
-          <li><a href="colaborar.php">Colaborar</a></li>
-          <li><a href="consejos.php">Consejos y recursos</a></li>
-          <li><a href="nosotros.php">Sobre Nosotros</a></li>
+          <li><a href="<?php echo $base_url; ?>index.php">Inicio</a></li>
+          <li><a href="<?php echo $base_url; ?>adoptar.php">Adoptar</a></li>
+          <li><a href="<?php echo $base_url; ?>colaborar.php">Colaborar</a></li>
+          <li><a href="<?php echo $base_url; ?>consejos.php">Consejos y recursos</a></li>
+          <li><a href="<?php echo $base_url; ?>nosotros.php">Sobre Nosotros</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Nosotros</h4>
         <ul>
-          <li><a href="nosotros.php">Sobre la protectora</a></li>
-          <li><a href="contacto.php">Contacto</a></li>
+          <li><a href="<?php echo $base_url; ?>nosotros.php">Sobre la protectora</a></li>
+          <li><a href="<?php echo $base_url; ?>contacto.php">Contacto</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Ayuda</h4>
         <ul>
-          <li><a href="adoptar.php">Proceso de adopción</a></li>
-          <li><a href="colaborar.php">Hazte colaborador</a></li>
-          <li><a href="donaciones.php">Donaciones</a></li>
+          <li><a href="<?php echo $base_url; ?>adoptar.php">Proceso de adopción</a></li>
+          <li><a href="<?php echo $base_url; ?>colaborar.php">Hazte colaborador</a></li>
+          <li><a href="<?php echo $base_url; ?>pages/donar.php">Donaciones</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Legal</h4>
         <ul>
-          <li><a href="aviso-legal.php">Aviso legal</a></li>
-          <li><a href="privacidad.php">Privacidad</a></li>
-          <li><a href="cookies.php">Cookies</a></li>
+          <li><a href="<?php echo $base_url; ?>aviso-legal.php">Aviso legal</a></li>
+          <li><a href="<?php echo $base_url; ?>privacidad.php">Privacidad</a></li>
+          <li><a href="<?php echo $base_url; ?>cookies.php">Cookies</a></li>
         </ul>
       </div>
     </div>
@@ -79,7 +79,6 @@
     if (scrollActual > ultimoScroll && scrollActual > 90) {
       header.classList.add('header-hidden');
     } else {
-        
       // Si subimos lo volvemos a mostrar
       header.classList.remove('header-hidden');
     }
