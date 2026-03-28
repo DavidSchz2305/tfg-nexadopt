@@ -1,6 +1,5 @@
 <?php
-// Primero, incluimos el header que ya tienes creado
-// La ruta es 'includes/header.php' porque index.php está en la raíz.
+// Primero incluimos el header 
 include 'includes/header.php';
 ?>
 
@@ -201,7 +200,6 @@ include 'includes/header.php';
 </main>
 
 <?php
-// Por último, incluimos el footer que ya tienes creado
-// La ruta es 'includes/footer.php' porque index.php está en la raíz.
+// Incluimos el footer 
 include 'includes/footer.php';
 ?>
