@@ -34,6 +34,7 @@ $base_url = "http://localhost/tfg-nexadopt/";
       <a href="<?php echo $base_url; ?>colaborar.php">Colaborar</a>
       <a href="<?php echo $base_url; ?>consejos.php">Consejos y recursos</a>
       <a href="<?php echo $base_url; ?>nosotros.php">Sobre Nosotros</a>
+      <a href="<?php echo $base_url; ?>contacto.php">Contacto</a>
     </nav>
 
     <div class="header-actions">
