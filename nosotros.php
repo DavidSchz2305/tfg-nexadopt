@@ -18,9 +18,9 @@ include 'includes/header.php';
 
         <div class="row justify-content-center mb-5">
             <div class="col-lg-10 d-flex justify-content-center flex-wrap gap-3">
-                <button class="btn btn-tab-nosotros active" onclick="mostrarSeccion('porque', this)">Por qué NexAdopt</button>
-                <button class="btn btn-tab-nosotros" onclick="mostrarSeccion('faq', this)">Preguntas frecuentes</button>
-                <button class="btn btn-tab-nosotros" onclick="mostrarSeccion('historias', this)">Historias</button>
+                <button id="btn-porque" class="btn btn-tab-nosotros active" onclick="mostrarSeccion('porque', this)">Por qué NexAdopt</button>
+                <button id="btn-faq" class="btn btn-tab-nosotros" onclick="mostrarSeccion('faq', this)">Preguntas frecuentes</button>
+                <button id="btn-historias" class="btn btn-tab-nosotros" onclick="mostrarSeccion('historias', this)">Historias</button>
             </div>
         </div>
 

@@ -164,7 +164,7 @@ include 'includes/header.php';
                             </div>
                         </div>
                         <div class="mt-2 text-center text-lg-start">
-                            <a href="historias.php" class="btn btn-nexadopt px-4 w-100 py-2">Leer más historias</a>
+                            <a href="nosotros.php" class="btn btn-nexadopt px-4 w-100 py-2">Leer más historias</a>
                         </div>
                     </div>
                 </div>
@@ -175,7 +175,7 @@ include 'includes/header.php';
                         <div class="card-body d-flex flex-column p-4 text-center flex-grow-1">
                             <p class="card-text text-brand fw-medium mb-4">Lia, la perrita que era invisible en el refugio, se ha convertido en la indiscutible reina de su nueva casa.</p>
                             <div class="mt-auto">
-                                <a href="historia-lia.php" class="btn btn-outline-nexadopt btn-sm px-4">Conoce a Lia</a>
+                                <a href="nosotros.php" class="btn btn-outline-nexadopt btn-sm px-4">Conoce a Lia</a>
                             </div>
                         </div>
                     </div>
@@ -187,7 +187,7 @@ include 'includes/header.php';
                         <div class="card-body d-flex flex-column p-4 text-center flex-grow-1">
                             <p class="card-text text-brand fw-medium mb-4">Tras un largo proceso de recuperación, el valiente Thor ya descansa tranquilo en su propio sofá familiar.</p>
                             <div class="mt-auto">
-                                <a href="historia-zeus.php" class="btn btn-outline-nexadopt btn-sm px-4">Conoce a Thor</a>
+                                <a href="nosotros.php" class="btn btn-outline-nexadopt btn-sm px-4">Conoce a Thor</a>
                             </div>
                         </div>
                     </div>
