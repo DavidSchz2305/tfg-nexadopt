@@ -1,6 +1,9 @@
 <?php
 // SEGURIDAD
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if(!isset($_SESSION['rol']) || $_SESSION['rol'] != 1) {
     header("Location: ../index.php");
     exit();
@@ -93,19 +96,29 @@ include '../includes/header_admin.php';
                     <span class="me-2">⚡</span> Acciones rápidas de gestión
                 </h5>
                 <div class="row g-4">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <a href="crear_mascotas.php" class="text-decoration-none">
-                            <div class="p-4 border rounded-3 bg-light text-center hover-shadow transition">
+                            <div class="p-4 border rounded-3 bg-light text-center hover-shadow transition h-100">
                                 <div class="fs-1 mb-2">➕</div>
                                 <div class="fs-5 fw-bold text-dark">Añadir Nueva Mascota</div>
                             </div>
                         </a>
                     </div>
-                    <div class="col-md-6">
+                    
+                    <div class="col-md-4">
                         <a href="solicitudes.php" class="text-decoration-none">
-                            <div class="p-4 border rounded-3 bg-light text-center hover-shadow transition">
+                            <div class="p-4 border rounded-3 bg-light text-center hover-shadow transition h-100">
                                 <div class="fs-1 mb-2">📋</div>
                                 <div class="fs-5 fw-bold text-dark">Revisar Solicitudes</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <a href="crear_historia.php" class="text-decoration-none">
+                            <div class="p-4 border rounded-3 bg-light text-center hover-shadow transition h-100">
+                                <div class="fs-1 mb-2">⭐</div>
+                                <div class="fs-5 fw-bold text-dark">Añadir Nueva Historia</div>
                             </div>
                         </a>
                     </div>

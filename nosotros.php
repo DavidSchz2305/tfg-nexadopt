@@ -119,61 +119,47 @@ include 'includes/header.php';
                     </div>
 
                     <div id="seccion-historias" class="seccion-tab" style="display: none;">
-                        <div class="text-center mb-5">
+                        <div class="text-center mb-5 position-relative">
                             <h2 class="fw-bold mb-3" style="color: var(--c4);">Historias con final feliz</h2>
                             <p class="lead" style="color: #6c868e;">Conoce a algunos de nuestros peludos que ya disfrutan de una segunda oportunidad.</p>
                         </div>
                         
                         <div class="row g-4">
-                            <div class="col-md-6 col-lg-4">
-                                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden historia-pro-card">
-                                    <div class="historia-img-wrapper">
-                                        <img src="assets/img/historias/tyson.jpg" class="card-img-top" alt="Tyson, perro adoptado" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop'">
-                                    </div>
-                                    <div class="card-body p-4 d-flex flex-column">
-                                        <span class="badge bg-light rounded-pill mb-2 align-self-start fw-bold" style="color: var(--c5);">Adoptado</span>
-                                        <h5 class="fw-bold mb-1" style="color: var(--c4);">Tyson</h5>
-                                        <p class="small mb-3" style="color: #6c868e;"><i class="fas fa-home me-1"></i> Familia Ruiz</p>
-                                        <p class="card-text small flex-grow-1" style="color: #6c868e;">
-                                            "Tyson llegó con mucho miedo y desconfianza, pero gracias a la paciencia y el cariño infinito de la familia Ruiz, hoy es el perro más juguetón y protector del parque. Le encantan sus largos paseos por la montaña."
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            <?php
+                            $sql_historias = "SELECT titulo, testimonio, foto_final_url, fecha_publicacion FROM historias_exito ORDER BY fecha_publicacion DESC";
+                            $resultado_historias = $conexion->query($sql_historias);
 
-                            <div class="col-md-6 col-lg-4">
-                                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden historia-pro-card">
-                                    <div class="historia-img-wrapper">
-                                        <img src="assets/img/historias/lia.jpg" class="card-img-top" alt="Lia, perrita adoptada" onerror="this.src='https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=600&auto=format&fit=crop'">
-                                    </div>
-                                    <div class="card-body p-4 d-flex flex-column">
-                                        <span class="badge bg-light rounded-pill mb-2 align-self-start fw-bold" style="color: var(--c5);">Adoptada</span>
-                                        <h5 class="fw-bold mb-1" style="color: var(--c4);">Lia</h5>
-                                        <p class="small mb-3" style="color: #6c868e;"><i class="fas fa-home me-1"></i> Laura y Carlos</p>
-                                        <p class="card-text small flex-grow-1" style="color: #6c868e;">
-                                            "Buscábamos una compañera tranquila para nuestro piso y Lia fue amor a primera vista. Desde el primer día se adueñó del sofá. NexAdopt nos guio en cada paso del proceso."
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 col-lg-4">
-                                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden historia-pro-card">
-                                    <div class="historia-img-wrapper">
-                                        <img src="assets/img/historias/thor.jpg" class="card-img-top" alt="Thor, perro adoptado" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=600&auto=format&fit=crop'">
-                                    </div>
-                                    <div class="card-body p-4 d-flex flex-column">
-                                        <span class="badge bg-light rounded-pill mb-2 align-self-start fw-bold" style="color: var(--c5);">Adoptado</span>
-                                        <h5 class="fw-bold mb-1" style="color: var(--c4);">Thor</h5>
-                                        <p class="small mb-3" style="color: #6c868e;"><i class="fas fa-home me-1"></i> Marcos G.</p>
-                                        <p class="card-text small flex-grow-1" style="color: #6c868e;">
-                                            "Tras un largo proceso de recuperación en la protectora, el valiente Thor ya descansa tranquilo en su propio sofá familiar. Es el compañero de siestas perfecto."
-                                        </p>
+                            if ($resultado_historias && $resultado_historias->num_rows > 0):
+                                while($historia = $resultado_historias->fetch_assoc()):
+                                    $foto = !empty($historia['foto_final_url']) ? $historia['foto_final_url'] : 'assets/img/default-mascota.jpg';
+                            ?>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden historia-pro-card">
+                                        <div class="historia-img-wrapper">
+                                            <img src="<?php echo htmlspecialchars($foto); ?>" class="card-img-top" alt="Historia de adopción" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop'">
+                                        </div>
+                                        <div class="card-body p-4 d-flex flex-column">
+                                            <span class="badge bg-light rounded-pill mb-3 align-self-start fw-bold" style="color: var(--c5);">
+                                                <i class="fas fa-star me-1" style="color: #ffc107;"></i> Final Feliz
+                                            </span>
+                                            <h5 class="fw-bold mb-1" style="color: var(--c4);"><?php echo htmlspecialchars($historia['titulo']); ?></h5>
+                                            <p class="card-text small flex-grow-1 mt-2" style="color: #6c868e; font-style: italic;">
+                                                "<?php echo htmlspecialchars($historia['testimonio']); ?>"
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            <?php 
+                                endwhile;
+                            else: 
+                            ?>
+                                <div class="col-12 text-center py-5">
+                                    <i class="fas fa-book-open fs-1 mb-3" style="color: var(--c2);"></i>
+                                    <h5 class="fw-bold" style="color: var(--c4);">Aún no hay historias publicadas</h5>
+                                    <p style="color: #6c868e;">¡Muy pronto compartiremos los finales felices de nuestros peludos!</p>
+                                </div>
+                            <?php endif; ?>
                         </div>
-
                     </div>
 
                 </div>
