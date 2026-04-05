@@ -43,7 +43,6 @@ include '../../includes/header.php';
 
                             <div class="icon-box rounded-4 shadow-sm p-3 mb-3">
                                 <div class="d-flex gap-3 align-items-start">
-                                    <div class="icon-circle rounded-circle d-inline-flex align-items-center justify-content-center fw-bold p-3">1</div>
                                     <div>
                                         <h3 class="h6 fw-bold text-dark mb-2">Compartid vuestro catalogo</h3>
                                         <p class="mb-0 text-muted">Facilitadnos la informacion basica de la asociacion y de los animales que buscan hogar.</p>
@@ -53,7 +52,6 @@ include '../../includes/header.php';
 
                             <div class="icon-box rounded-4 shadow-sm p-3 mb-3">
                                 <div class="d-flex gap-3 align-items-start">
-                                    <div class="icon-circle rounded-circle d-inline-flex align-items-center justify-content-center fw-bold p-3">2</div>
                                     <div>
                                         <h3 class="h6 fw-bold text-dark mb-2">Nosotros creamos el perfil</h3>
                                         <p class="mb-0 text-muted">Nuestro equipo de administracion sube las fichas y optimiza las fotos para maximizar su alcance.</p>
@@ -61,12 +59,20 @@ include '../../includes/header.php';
                                 </div>
                             </div>
 
-                            <div class="icon-box rounded-4 shadow-sm p-3 mb-4">
+                            <div class="icon-box rounded-4 shadow-sm p-3 mb-3">
                                 <div class="d-flex gap-3 align-items-start">
-                                    <div class="icon-circle rounded-circle d-inline-flex align-items-center justify-content-center fw-bold p-3">3</div>
                                     <div>
                                         <h3 class="h6 fw-bold text-dark mb-2">Recibid adoptantes filtrados</h3>
                                         <p class="mb-0 text-muted">En cuanto un usuario rellena el formulario de NexAdopt, os lo hacemos llegar validado y listo para revisar.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="icon-box rounded-4 shadow-sm p-3 mb-4">
+                                <div class="d-flex gap-3 align-items-start">
+                                    <div>
+                                        <h3 class="h6 fw-bold text-dark mb-2">Tomad la decisión final</h3>
+                                        <p class="mb-0 text-muted">Vosotros tenéis la última palabra. Conoced a los candidatos pre-aprobados y gestionad el contrato de adopción bajo vuestros propios términos.</p>
                                     </div>
                                 </div>
                             </div>
@@ -89,7 +95,7 @@ include '../../includes/header.php';
                                 </div>
                             </div>
 
-                            <a href="../../colaborar.php" class="btn btn-donar btn-lg fw-bold mt-auto w-100 py-3">
+                            <a href="../../contacto.php" class="btn btn-donar btn-lg fw-bold mt-auto w-100 py-3">
                                 Contacta con nosotros y unete a la red
                             </a>
                         </div>
@@ -106,43 +112,49 @@ include '../../includes/header.php';
                             </div>
 
                             <div class="d-grid gap-3">
-                                <div class="icon-box rounded-4 shadow-sm p-3">
-                                    <div class="d-flex gap-3 align-items-start">
-                                        <div class="icon-circle rounded-circle d-inline-flex align-items-center justify-content-center fw-bold p-3">1</div>
+                                
+                                <div class="icon-box rounded-4 shadow-sm p-3 p-lg-4">
+                                    <div class="d-flex gap-4 align-items-center">
+                                        <div class="fw-bolder flex-shrink-0" style="color: var(--c5); font-size: 4.5rem; line-height: 1;">1</div>
                                         <p class="mb-0 text-muted">Gestion de visibilidad total: nosotros nos encargamos de publicar y mantener actualizadas las fichas de vuestros animales en la plataforma.</p>
                                     </div>
                                 </div>
-                                <div class="icon-box rounded-4 shadow-sm p-3">
-                                    <div class="d-flex gap-3 align-items-start">
-                                        <div class="icon-circle rounded-circle d-inline-flex align-items-center justify-content-center fw-bold p-3">2</div>
+
+                                <div class="icon-box rounded-4 shadow-sm p-3 p-lg-4">
+                                    <div class="d-flex gap-4 align-items-center">
+                                        <div class="fw-bolder flex-shrink-0" style="color: var(--c5); font-size: 4.5rem; line-height: 1;">2</div>
                                         <p class="mb-0 text-muted">Filtro previo de candidatos: recibid solo solicitudes de personas que realmente cumplen con vuestros requisitos minimos de adopcion.</p>
                                     </div>
                                 </div>
-                                <div class="icon-box rounded-4 shadow-sm p-3">
-                                    <div class="d-flex gap-3 align-items-start">
-                                        <div class="icon-circle rounded-circle d-inline-flex align-items-center justify-content-center fw-bold p-3">3</div>
+
+                                <div class="icon-box rounded-4 shadow-sm p-3 p-lg-4">
+                                    <div class="d-flex gap-4 align-items-center">
+                                        <div class="fw-bolder flex-shrink-0" style="color: var(--c5); font-size: 4.5rem; line-height: 1;">3</div>
                                         <p class="mb-0 text-muted">Reduccion de carga administrativa: olvidaos de gestionar decenas de correos iniciales; os entregamos el formulario listo para la decision final.</p>
                                     </div>
                                 </div>
-                                <div class="icon-box rounded-4 shadow-sm p-3">
-                                    <div class="d-flex gap-3 align-items-start">
-                                        <div class="icon-circle rounded-circle d-inline-flex align-items-center justify-content-center fw-bold p-3">4</div>
+
+                                <div class="icon-box rounded-4 shadow-sm p-3 p-lg-4">
+                                    <div class="d-flex gap-4 align-items-center">
+                                        <div class="fw-bolder flex-shrink-0" style="color: var(--c5); font-size: 4.5rem; line-height: 1;">4</div>
                                         <p class="mb-0 text-muted">Enlace directo y fluido: centralizamos la comunicacion inicial para que vuestro equipo solo tenga que intervenir en el paso definitivo.</p>
                                     </div>
                                 </div>
-                                <div class="icon-box rounded-4 shadow-sm p-3">
-                                    <div class="d-flex gap-3 align-items-start">
-                                        <div class="icon-circle rounded-circle d-inline-flex align-items-center justify-content-center fw-bold p-3">5</div>
+
+                                <div class="icon-box rounded-4 shadow-sm p-3 p-lg-4">
+                                    <div class="d-flex gap-4 align-items-center">
+                                        <div class="fw-bolder flex-shrink-0" style="color: var(--c5); font-size: 4.5rem; line-height: 1;">5</div>
                                         <p class="mb-0 text-muted">Gestion segura de la informacion: centralizamos la proteccion de datos de los candidatos bajo protocolos seguros para ayudaros a cumplir con la normativa vigente sin gestionar bases de datos externas ni documentos fisicos dispersos.</p>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4 px-3">
                 <div>
                     <h2 class="fw-bold text-dark mb-1">Nuestras asociaciones</h2>
                     <p class="text-muted mb-0">Protectores y entidades que ya forman parte de nuestra red.</p>
@@ -152,8 +164,8 @@ include '../../includes/header.php';
             <div class="row g-4">
                 <div class="col-md-6 col-xl-3">
                     <div class="card collaboration-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                        <div class="ratio ratio-4x3 bg-white d-flex align-items-center justify-content-center p-3">
-                            <img src="../../assets/img/colaborar/Asocia-AbrazoAnimal.png" class="w-100 h-100 object-fit-contain" alt="Abrazo Animal">
+                        <div class="bg-white d-flex align-items-center justify-content-center border-bottom" style="height: 200px;">
+                            <img src="../../assets/img/colaborar/Asocia-AbrazoAnimal.png" class="img-fluid" style="max-height: 65%; max-width: 65%; object-fit: contain;" alt="Abrazo Animal">
                         </div>
                         <div class="card-body d-flex flex-column p-4">
                             <h3 class="card-title fw-bold text-dark h5 mb-2">Abrazo Animal</h3>
@@ -167,42 +179,45 @@ include '../../includes/header.php';
 
                 <div class="col-md-6 col-xl-3">
                     <div class="card collaboration-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                        <div class="ratio ratio-4x3 bg-white d-flex align-items-center justify-content-center p-3">
-                            <img src="../../assets/img/colaborar/Asocia-Anaa.png" class="w-100 h-100 object-fit-contain" alt="ANAA">
+                        <div class="bg-white d-flex align-items-center justify-content-center border-bottom" style="height: 200px;">
+                            <img src="../../assets/img/colaborar/Asocia-Anaa.png" class="img-fluid" style="max-height: 65%; max-width: 65%; object-fit: contain;" alt="ANAA">
                         </div>
                         <div class="card-body d-flex flex-column p-4">
                             <h3 class="card-title fw-bold text-dark h5 mb-2">ANAA</h3>
                             <p class="card-text text-muted mb-0">
                                 Rescatan todo tipo de animales y cuentan con una clinica propia de alto nivel.
                             </p>
+                            <a href="perfil-asociacion-ANAA.php" class="btn btn-outline-nexadopt mt-4">Ver perfil</a>                        
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-6 col-xl-3">
                     <div class="card collaboration-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                        <div class="ratio ratio-4x3 bg-white d-flex align-items-center justify-content-center p-3">
-                            <img src="../../assets/img/colaborar/Asocia-ElRefugio.png" class="w-100 h-100 object-fit-contain" alt="El Refugio">
+                        <div class="bg-white d-flex align-items-center justify-content-center border-bottom" style="height: 200px;">
+                            <img src="../../assets/img/colaborar/Asocia-ElRefugio.png" class="img-fluid" style="max-height: 65%; max-width: 65%; object-fit: contain;" alt="El Refugio">
                         </div>
                         <div class="card-body d-flex flex-column p-4">
                             <h3 class="card-title fw-bold text-dark h5 mb-2">El Refugio</h3>
                             <p class="card-text text-muted mb-0">
                                 Referentes en la lucha legal y judicial contra el maltrato animal y en veterinaria social.
                             </p>
+                            <a href="perfil-asociacion-ElRefugio.php" class="btn btn-outline-nexadopt mt-4">Ver perfil</a>              
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-6 col-xl-3">
                     <div class="card collaboration-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                        <div class="ratio ratio-4x3 bg-white d-flex align-items-center justify-content-center p-3">
-                            <img src="../../assets/img/colaborar/Asocia-Spap.png" class="w-100 h-100 object-fit-contain" alt="SPAP">
+                        <div class="bg-white d-flex align-items-center justify-content-center border-bottom" style="height: 200px;">
+                            <img src="../../assets/img/colaborar/Asocia-Spap.jpg" class="img-fluid" style="max-height: 65%; max-width: 65%; object-fit: contain;" alt="SPAP">
                         </div>
                         <div class="card-body d-flex flex-column p-4">
                             <h3 class="card-title fw-bold text-dark h5 mb-2">SPAP</h3>
                             <p class="card-text text-muted mb-0">
                                 Expertos en casos dificiles y en encontrar hogar para animales invisibles o senior.
                             </p>
+                            <a href="perfil-asociacion-SPAP.php" class="btn btn-outline-nexadopt mt-4">Ver perfil</a>                                      
                         </div>
                     </div>
                 </div>
