@@ -84,7 +84,7 @@ include 'includes/header.php';
                                 </ul>
                             </div>
 
-                            <a href="#" class="btn btn-warning btn-lg mt-auto w-100 rounded-3 text-dark" style="font-weight: 500;">
+                            <a href="pages/colabora/acoge.php" class="btn btn-warning btn-lg mt-auto w-100 rounded-3 text-dark" style="font-weight: 500;">
                                 Dar hogar temporal
                             </a>
                         </div>
