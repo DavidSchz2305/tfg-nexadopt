@@ -1,3 +1,36 @@
+<style>
+  /* =========================================================================
+     RESPONSIVE PARA EL FOOTER 
+     ========================================================================= */
+  @media (max-width: 991px) {
+    .site-footer .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2.5rem;
+    }
+    .site-footer .footer-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 1.5rem;
+    }
+    .site-footer .footer-social {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .site-footer .footer-col {
+      margin-bottom: 1rem;
+    }
+    .site-footer .footer-col ul {
+      padding-left: 0; /* Centra las listas en móvil */
+    }
+  }
+</style>
+
 <footer class="site-footer">
   <div class="footer-inner">
 
@@ -53,9 +86,9 @@
       <div class="footer-col">
         <h4>Legal</h4>
         <ul>
-          <li><a href="<?php echo $base_url; ?>aviso-legal.php">Aviso legal</a></li>
-          <li><a href="<?php echo $base_url; ?>privacidad.php">Privacidad</a></li>
-          <li><a href="<?php echo $base_url; ?>cookies.php">Cookies</a></li>
+          <li><a href="<?php echo $base_url; ?>pages/aviso-legal.php">Aviso legal</a></li>
+          <li><a href="<?php echo $base_url; ?>pages/privacidad.php">Privacidad</a></li>
+          <li><a href="<?php echo $base_url; ?>pages/cookies.php">Cookies</a></li>
         </ul>
       </div>
     </div>

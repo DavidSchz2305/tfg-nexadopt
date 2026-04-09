@@ -17,26 +17,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email'] ?? '');
     $asunto = trim($_POST['asunto'] ?? '');
     $mensaje = trim($_POST['mensaje'] ?? '');
+    // Verificamos si se ha marcado el checkbox de términos legales
+    $terminos_aceptados = isset($_POST['terminos']) ? true : false;
     
-    // Validar que los campos obligatorios no estén vacíos
+    // Validar que los campos obligatorios no estén vacíos y que se han aceptado los términos
     if (!empty($nombre) && !empty($email) && !empty($asunto) && !empty($mensaje)) {
-        
-        // Preparar la consulta SQL para evitar inyecciones SQL
-        $sql = "INSERT INTO mensajes_contacto (nombre, telefono, email, asunto, mensaje) VALUES (?, ?, ?, ?, ?)";
-        
-        if ($stmt = $conexion->prepare($sql)) {
-            // Vinculamos los parámetros
-            $stmt->bind_param("sssss", $nombre, $telefono, $email, $asunto, $mensaje);
+        if ($terminos_aceptados) {
+            // Preparar la consulta SQL para evitar inyecciones SQL
+            $sql = "INSERT INTO mensajes_contacto (nombre, telefono, email, asunto, mensaje) VALUES (?, ?, ?, ?, ?)";
             
-            // Ejecutamos la consulta
-            if ($stmt->execute()) {
-                $mensaje_enviado = true;
+            if ($stmt = $conexion->prepare($sql)) {
+                // Vinculamos los parámetros
+                $stmt->bind_param("sssss", $nombre, $telefono, $email, $asunto, $mensaje);
+                
+                // Ejecutamos la consulta
+                if ($stmt->execute()) {
+                    $mensaje_enviado = true;
+                } else {
+                    $error_mensaje = "Lo sentimos, hubo un error técnico al guardar tu mensaje.";
+                }
+                $stmt->close();
             } else {
-                $error_mensaje = "Lo sentimos, hubo un error técnico al guardar tu mensaje.";
+                $error_mensaje = "Error al conectar con la base de datos.";
             }
-            $stmt->close();
         } else {
-            $error_mensaje = "Error al conectar con la base de datos.";
+            $error_mensaje = "Debes aceptar la Política de Privacidad para poder enviar el mensaje.";
         }
     } else {
         $error_mensaje = "Por favor, rellena todos los campos obligatorios.";
@@ -95,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <div>
                             <h6 class="fw-bold mb-1" style="color: var(--c4);">Ubicación</h6>
-                            <p class="text-muted small mb-0">Av. de la Ilusión, 123<br>28100 Alcobendas, Madrid</p>
+                            <p class="text-muted small mb-0">Plaza Norte 2<br>28108 Alcobendas, Madrid</p>
                         </div>
                     </div>
 
@@ -121,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <div class="rounded-3 overflow-hidden mt-4 shadow-sm border" style="height: 250px;">
                         <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d48473.18953158917!2d-3.6749176144883387!3d40.53982463428989!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422cd113fba359%3A0xc3f1a3fb1b1c6d31!2sAlcobendas%2C%20Madrid!5e0!3m2!1ses!2ses!4v1715000000000!5m2!1ses!2ses" 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12128.530653655474!2d-3.6334651030064245!3d40.53866299863481!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422e1cae3d5fcb%3A0xbc70fdebb6d34e6e!2sParque%20Comercial%20R%C3%ADo%20Norte!5e0!3m2!1ses!2ses!4v1712760000000!5m2!1ses!2ses" 
                             width="100%" 
                             height="100%" 
                             style="border:0;" 
@@ -167,8 +172,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <label class="form-label small fw-bold" style="color: var(--c4);">Mensaje</label>
                                 <textarea name="mensaje" class="form-control form-contacto-input" rows="5" placeholder="Escribe aquí todos los detalles de tu consulta..." required></textarea>
                             </div>
+                            
+                            <div class="col-12 mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="terminos" id="checkTerminos" required>
+                                    <label class="form-check-label small text-muted" for="checkTerminos">
+                                        He leído y acepto el <a href="pages/aviso-legal.php" target="_blank" class="text-decoration-none fw-bold" style="color: var(--c5);">Aviso Legal</a> y la <a href="pages/privacidad.php" target="_blank" class="text-decoration-none fw-bold" style="color: var(--c5);">Política de Privacidad</a> referentes al tratamiento de mis datos.
+                                    </label>
+                                </div>
+                            </div>
+
                             <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-submit-contacto w-100 fw-bold rounded-pill text-uppercase shadow-sm py-3">
+                                <button type="submit" class="btn btn-submit-contacto w-100 fw-bold rounded-pill text-uppercase shadow-sm py-3" style="background-color: var(--c4); color: white;">
                                     <i class="fas fa-paper-plane me-2"></i> Enviar Mensaje
                                 </button>
                             </div>

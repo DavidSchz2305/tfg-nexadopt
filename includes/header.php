@@ -18,6 +18,63 @@ $base_url = "http://localhost/tfg-nexadopt/";
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   
   <link rel="stylesheet" href="/tfg-nexadopt/assets/css/style.css?v=<?php echo time(); ?>" />
+
+  <style>
+    /* =========================================================================
+       ESTILOS PARA EL MENÚ MÓVIL 
+       ========================================================================= */
+    
+    /* 1. MODO ORDENADOR (> 992px) */
+    @media (min-width: 992px) {
+      .menu-colapsable-seguro {
+        /* Esto hace que el contenedor "desaparezca" */
+        display: contents !important; 
+      }
+      .btn-hamburguesa {
+        display: none !important; /* Ocultamos el botón en PC */
+      }
+    }
+
+    /* 2. MODO MÓVIL Y TABLET (< 991px) */
+    @media (max-width: 991px) {
+      .site-header {
+        position: relative;
+      }
+      .btn-hamburguesa {
+        background: none;
+        border: none;
+        color: var(--c4, #2d4c54); 
+        cursor: pointer;
+        padding: 5px;
+      }
+      .menu-colapsable-seguro {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff; /* Fondo del menú desplegable */
+        padding: 2rem 1rem;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        z-index: 9999;
+        border-top: 1px solid #eaeaea;
+      }
+      /* Apilamos tus enlaces originales verticalmente */
+      .menu-colapsable-seguro nav {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+        margin-bottom: 25px;
+      }
+      /* Apilamos tus botones originales (Donar, Perfil) */
+      .menu-colapsable-seguro .header-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -28,51 +85,61 @@ $base_url = "http://localhost/tfg-nexadopt/";
       <img src="<?php echo $base_url; ?>assets/img/header_footer/logo.png" alt="NexAdopt logo" />
     </a>
 
-    <nav>
-      <a href="<?php echo $base_url; ?>index.php">Inicio</a>
-      <a href="<?php echo $base_url; ?>adoptar.php">Adoptar</a>
-      <a href="<?php echo $base_url; ?>colaborar.php">Colaborar</a>
-      <a href="<?php echo $base_url; ?>consejos.php">Consejos y recursos</a>
-      <a href="<?php echo $base_url; ?>nosotros.php">Sobre Nosotros</a>
-      <a href="<?php echo $base_url; ?>contacto.php">Contacto</a>
-    </nav>
+    <button class="btn-hamburguesa" type="button" data-bs-toggle="collapse" data-bs-target="#menuMovil" aria-expanded="false" aria-controls="menuMovil">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
 
-    <div class="header-actions">
-      <a href="<?php echo $base_url; ?>pages/donar.php" class="btn-donar">❤ Donar</a>
+    <div class="collapse menu-colapsable-seguro" id="menuMovil">
+      
+      <nav>
+        <a href="<?php echo $base_url; ?>index.php">Inicio</a>
+        <a href="<?php echo $base_url; ?>adoptar.php">Adoptar</a>
+        <a href="<?php echo $base_url; ?>colaborar.php">Colaborar</a>
+        <a href="<?php echo $base_url; ?>consejos.php">Consejos y recursos</a>
+        <a href="<?php echo $base_url; ?>nosotros.php">Sobre Nosotros</a>
+        <a href="<?php echo $base_url; ?>contacto.php">Contacto</a>
+      </nav>
 
-      <?php if(isset($_SESSION['id_usuario'])): ?>
-        <div class="dropdown">
-          <a href="#" class="btn-profile dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Perfil de <?php echo $_SESSION['nombre']; ?>">
+      <div class="header-actions">
+        <a href="<?php echo $base_url; ?>pages/donar.php" class="btn-donar">❤ Donar</a>
+
+        <?php if(isset($_SESSION['id_usuario'])): ?>
+          <div class="dropdown">
+            <a href="#" class="btn-profile dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Perfil de <?php echo $_SESSION['nombre']; ?>">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 mt-2">
+              <li class="px-3 py-2 border-bottom bg-light rounded-top-3">
+                <span class="d-block small text-muted">Hola,</span>
+                <span class="fw-bold text-brand"><?php echo $_SESSION['nombre']; ?></span>
+              </li>
+              
+              <?php if(isset($_SESSION['rol']) && $_SESSION['rol'] == 1): ?>
+                <li><a class="dropdown-item py-2" href="<?php echo $base_url; ?>admin/dashboard.php">⚙ Panel Admin</a></li>
+              <?php endif; ?>
+
+              <li><a class="dropdown-item py-2" href="<?php echo $base_url; ?>perfil.php">👤 Mi Perfil</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item py-2 text-danger" href="<?php echo $base_url; ?>logout.php">🚪 Cerrar sesión</a></li>
+            </ul>
+          </div>
+
+        <?php else: ?>
+          <a href="<?php echo $base_url; ?>login.php" class="btn-profile" title="Iniciar sesión / Registro">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="8" r="4"/>
               <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
             </svg>
           </a>
-          <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 mt-2">
-            <li class="px-3 py-2 border-bottom bg-light rounded-top-3">
-              <span class="d-block small text-muted">Hola,</span>
-              <span class="fw-bold text-brand"><?php echo $_SESSION['nombre']; ?></span>
-            </li>
-            
-            <?php if(isset($_SESSION['rol']) && $_SESSION['rol'] == 1): ?>
-              <li><a class="dropdown-item py-2" href="<?php echo $base_url; ?>admin/dashboard.php">⚙ Panel Admin</a></li>
-            <?php endif; ?>
+        <?php endif; ?>
+      </div>
 
-            <li><a class="dropdown-item py-2" href="<?php echo $base_url; ?>perfil.php">👤 Mi Perfil</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item py-2 text-danger" href="<?php echo $base_url; ?>logout.php">🚪 Cerrar sesión</a></li>
-          </ul>
-        </div>
-
-      <?php else: ?>
-        <a href="<?php echo $base_url; ?>login.php" class="btn-profile" title="Iniciar sesión / Registro">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="4"/>
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-          </svg>
-        </a>
-      <?php endif; ?>
-    </div>
-
-  </div>
+    </div> </div>
 </header>
