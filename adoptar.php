@@ -95,7 +95,9 @@ if($resultado && $resultado->num_rows > 0) {
                     <form action="adoptar.php" method="GET">
                         
                         <div class="mb-3">
-                            <label class="form-label fw-semibold text-brand"><span class="me-2">🐾</span>Especie</label>
+                            <label class="form-label fw-semibold text-brand d-flex align-items-center gap-1">
+                                <i data-lucide="paw-print" style="width:14px; height:14px;"></i> Especie
+                            </label>
                             <select class="form-select border-c2" name="especie">
                                 <option value="">Todos</option>
                                 <option value="perros" <?= ($f_especie == 'perros') ? 'selected' : '' ?>>Perros</option>
@@ -105,7 +107,9 @@ if($resultado && $resultado->num_rows > 0) {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold text-brand"><span class="me-2">🏷️</span>Raza</label>
+                            <label class="form-label fw-semibold text-brand d-flex align-items-center gap-1">
+                                <i data-lucide="tag" style="width:14px; height:14px;"></i> Raza
+                            </label>
                             <select class="form-select border-c2" name="raza">
                                 <option value="">Cualquier raza</option>
                                 <?php 
@@ -123,7 +127,9 @@ if($resultado && $resultado->num_rows > 0) {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold text-brand"><span class="me-2">🎂</span>Edad</label>
+                            <label class="form-label fw-semibold text-brand d-flex align-items-center gap-1">
+                                <i data-lucide="calendar" style="width:14px; height:14px;"></i> Edad
+                            </label>
                             <select class="form-select border-c2" name="edad">
                                 <option value="">Todas las edades</option>
                                 <option value="cachorro" <?= ($f_edad == 'cachorro') ? 'selected' : '' ?>>Cachorro (0-1 año)</option>
@@ -133,7 +139,9 @@ if($resultado && $resultado->num_rows > 0) {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold text-brand"><span class="me-2">📏</span>Tamaño</label>
+                            <label class="form-label fw-semibold text-brand d-flex align-items-center gap-1">
+                                <i data-lucide="maximize-2" style="width:14px; height:14px;"></i> Tamaño
+                            </label>
                             <select class="form-select border-c2" name="tamano">
                                 <option value="">Cualquier tamaño</option>
                                 <option value="pequeno" <?= ($f_tamano == 'pequeno') ? 'selected' : '' ?>>Pequeño</option>
@@ -143,7 +151,9 @@ if($resultado && $resultado->num_rows > 0) {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold text-brand"><span class="me-2">⚥</span>Género</label>
+                            <label class="form-label fw-semibold text-brand d-flex align-items-center gap-1">
+                                <i data-lucide="users" style="width:14px; height:14px;"></i> Género
+                            </label>
                             <select class="form-select border-c2" name="genero">
                                 <option value="">Cualquiera</option>
                                 <option value="macho" <?= ($f_genero == 'macho') ? 'selected' : '' ?>>Macho</option>
@@ -179,7 +189,9 @@ if($resultado && $resultado->num_rows > 0) {
                     <?php if(empty($mascotas_filtradas)): ?>
                         <div class="col-12 w-100 text-center py-5">
                             <div class="p-5 bg-white rounded-4 shadow-sm border border-c2">
-                                <div class="fs-1 mb-3">🐶😿</div>
+                                <div class="mb-3 d-flex justify-content-center gap-2">
+                                    <i data-lucide="search-x" style="width:48px; height:48px; color: var(--color-brand, #4a5d63);"></i>
+                                </div>
                                 <h4 class="text-brand fw-bold">No hemos encontrado compañeros con esos filtros</h4>
                                 <p class="text-muted">Prueba a quitar algún filtro o buscar de forma más general.</p>
                                 <a href="adoptar.php" class="btn btn-nexadopt mt-2">Ver todos los animales</a>
@@ -212,5 +224,8 @@ if($resultado && $resultado->num_rows > 0) {
         </div>
     </div>
 </main>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
 
 <?php include 'includes/footer.php'; ?>

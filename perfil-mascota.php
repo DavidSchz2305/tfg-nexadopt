@@ -71,8 +71,8 @@ $foto_principal = $fotos_galeria[0];
 <main class="site-main bg-crema py-5">
     <div class="container">
         <div class="mb-4">
-            <a href="adoptar.php" class="text-decoration-none text-muted fw-bold transition hover-brand">
-                <span class="me-2">←</span> Volver a todas las mascotas
+            <a href="adoptar.php" class="text-decoration-none text-muted fw-bold transition hover-brand d-inline-flex align-items-center gap-1">
+                <i data-lucide="arrow-left" style="width:16px; height:16px;"></i> Volver a todas las mascotas
             </a>
         </div>
 
@@ -119,27 +119,39 @@ $foto_principal = $fotos_galeria[0];
                             <h5 class="fw-bold text-brand mb-4">Ficha Técnica</h5>
                             <div class="row g-3">
                                 <div class="col-6 d-flex flex-column border-bottom pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase"><span class="me-2">🏷️</span>Raza</span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                                        <i data-lucide="tag" style="width:13px; height:13px;"></i> Raza
+                                    </span>
                                     <span class="fw-semibold text-dark"><?= htmlspecialchars($mascota['raza']) ?></span>
                                 </div>
                                 <div class="col-6 d-flex flex-column border-bottom pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase"><span class="me-2">🎂</span>Edad</span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                                        <i data-lucide="calendar" style="width:13px; height:13px;"></i> Edad
+                                    </span>
                                     <span class="fw-semibold text-dark"><?= $mascota['edad_valor'] ?> <?= $mascota['edad_unidad'] ?></span>
                                 </div>
                                 <div class="col-6 d-flex flex-column border-bottom pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase"><span class="me-2">📏</span>Tamaño</span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                                        <i data-lucide="maximize-2" style="width:13px; height:13px;"></i> Tamaño
+                                    </span>
                                     <span class="fw-semibold text-dark"><?= htmlspecialchars($mascota['tamanio']) ?></span>
                                 </div>
                                 <div class="col-6 d-flex flex-column border-bottom pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase"><span class="me-2">⚥</span>Sexo</span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                                        <i data-lucide="users" style="width:13px; height:13px;"></i> Sexo
+                                    </span>
                                     <span class="fw-semibold text-dark"><?= htmlspecialchars($mascota['sexo']) ?></span>
                                 </div>
                                 <div class="col-6 d-flex flex-column pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase"><span class="me-2">🏡</span>Convivencia</span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                                        <i data-lucide="home" style="width:13px; height:13px;"></i> Convivencia
+                                    </span>
                                     <span class="fw-semibold text-dark small">Perros y niños</span>
                                 </div>
                                 <div class="col-6 d-flex flex-column pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase"><span class="me-2">🌳</span>Exterior</span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
+                                        <i data-lucide="tree-pine" style="width:13px; height:13px;"></i> Exterior
+                                    </span>
                                     <span class="fw-semibold text-dark">Solo interior</span>
                                 </div>
                             </div>
@@ -156,8 +168,8 @@ $foto_principal = $fotos_galeria[0];
                             Este animal ya ha sido adoptado
                         </button>
                     <?php elseif(isset($_SESSION['id_usuario'])): ?>
-                        <a href="formulario-solicitud.php?id_mascota=<?= $mascota['id_mascota'] ?>" class="btn btn-nexadopt btn-lg w-100 fw-bold shadow-sm py-3">
-                            ❤️ Empieza tu solicitud
+                        <a href="formulario-solicitud.php?id_mascota=<?= $mascota['id_mascota'] ?>" class="btn btn-nexadopt btn-lg w-100 fw-bold shadow-sm py-3 d-inline-flex align-items-center justify-content-center gap-2">
+                            <i data-lucide="heart" style="width:18px; height:18px;"></i> Empieza tu solicitud
                         </a>
                     <?php else: ?>
                         <div class="text-center bg-light p-3 rounded-3 border">
@@ -175,5 +187,7 @@ $foto_principal = $fotos_galeria[0];
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/fslightbox/index.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
 
 <?php include 'includes/footer.php'; ?>
