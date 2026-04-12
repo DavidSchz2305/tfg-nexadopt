@@ -45,8 +45,12 @@ include '../includes/header_admin.php';
 
 <div class="container-fluid py-4">
     <div class="d-flex align-items-center mb-4">
-        <a href="gestionar_historias.php" class="btn btn-outline-secondary border-0 me-3" style="font-size: 1.2rem;">⬅️</a>
-        <h2 class="fw-bold text-brand mb-0">⭐ Añadir Nueva Historia</h2>
+        <a href="gestionar_historias.php" class="btn btn-outline-secondary border-0 me-3 d-inline-flex align-items-center">
+            <i data-lucide="arrow-left" style="width:20px; height:20px;"></i>
+        </a>
+        <h2 class="fw-bold text-brand mb-0 d-flex align-items-center gap-2">
+            <i data-lucide="star" style="width:28px; height:28px;"></i> Añadir Nueva Historia
+        </h2>
     </div>
 
     <div class="row">
@@ -55,12 +59,16 @@ include '../includes/header_admin.php';
                 <form action="crear_historia.php" method="POST">
                     
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase">Título / Nombre <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold text-muted small text-uppercase d-flex align-items-center gap-1">
+                            <i data-lucide="type" style="width:14px; height:14px;"></i> Título / Nombre <span class="text-danger">*</span>
+                        </label>
                         <input type="text" name="titulo" class="form-control form-control-lg bg-light border-0" placeholder="Ej: Tyson encontró su hogar" required>
                     </div>
                     
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase">Selecciona Fotografía</label>
+                        <label class="form-label fw-bold text-muted small text-uppercase d-flex align-items-center gap-1">
+                            <i data-lucide="image" style="width:14px; height:14px;"></i> Selecciona Fotografía
+                        </label>
                         <select name="foto_seleccionada" class="form-select form-select-lg bg-light border-0" style="cursor: pointer;">
                             <option value="">-- Selecciona imagen de la carpeta --</option>
                             <?php foreach($lista_imagenes as $img): ?>
@@ -70,15 +78,21 @@ include '../includes/header_admin.php';
                     </div>
 
                     <div class="mb-5">
-                        <label class="form-label fw-bold text-muted small text-uppercase">Testimonio <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold text-muted small text-uppercase d-flex align-items-center gap-1">
+                            <i data-lucide="file-text" style="width:14px; height:14px;"></i> Testimonio <span class="text-danger">*</span>
+                        </label>
                         <textarea name="testimonio" class="form-control bg-light border-0" rows="6" placeholder="Escribe el testimonio aquí..." required></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-nexadopt px-5 py-2"> Guardar Historia</button>
+                    <button type="submit" class="btn btn-nexadopt px-5 py-2 d-inline-flex align-items-center gap-2">
+                        <i data-lucide="save" style="width:16px; height:16px;"></i> Guardar Historia
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>lucide.createIcons();</script>
 
 <?php include '../includes/footer_admin.php'; ?>

@@ -35,8 +35,12 @@ include '../includes/header_admin.php';
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-brand mb-0">🐾 Inventario Total de Mascotas</h2>
-        <a href="crear_mascotas.php" class="btn btn-nexadopt">➕ Añadir Nueva</a>
+        <h2 class="fw-bold text-brand mb-0 d-flex align-items-center gap-2">
+            <i data-lucide="paw-print" style="width:28px; height:28px;"></i> Inventario Total de Mascotas
+        </h2>
+        <a href="crear_mascotas.php" class="btn btn-nexadopt d-flex align-items-center gap-2">
+            <i data-lucide="plus-circle" style="width:18px; height:18px;"></i> Añadir Nueva
+        </a>
     </div>
 
     <?php if(isset($_GET['msj']) && $_GET['msj'] == 'borrado'): ?>
@@ -91,15 +95,20 @@ include '../includes/header_admin.php';
                                     <?php echo (strlen($row['descripcion']) > 45) ? substr($row['descripcion'], 0, 45) . '...' : $row['descripcion']; ?>
                                 </td>
                                 <td>
-                                    <span class="badge bg-light text-dark border rounded-pill px-3">
-                                        <?php echo $row['total_solicitudes']; ?> 📩
+                                    <span class="badge bg-light text-dark border rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                                        <?php echo $row['total_solicitudes']; ?>
+                                        <i data-lucide="mail" style="width:13px; height:13px;"></i>
                                     </span>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <a href="editar_mascota.php?id=<?php echo $row['id_mascota']; ?>" class="btn btn-sm btn-outline-primary border-0 me-2">✏️ Editar</a>
+                                    <a href="editar_mascota.php?id=<?php echo $row['id_mascota']; ?>" class="btn btn-sm btn-outline-primary border-0 me-2 d-inline-flex align-items-center gap-1">
+                                        <i data-lucide="pencil" style="width:14px; height:14px;"></i> Editar
+                                    </a>
                                     <a href="lista_mascotas.php?eliminar=<?php echo $row['id_mascota']; ?>" 
-                                       class="btn btn-sm btn-outline-danger border-0" 
-                                       onclick="return confirm('¿Eliminar a <?php echo $row['nombre']; ?>?')">🗑️ Borrar</a>
+                                       class="btn btn-sm btn-outline-danger border-0 d-inline-flex align-items-center gap-1"
+                                       onclick="return confirm('¿Eliminar a <?php echo $row['nombre']; ?>?')">
+                                        <i data-lucide="trash-2" style="width:14px; height:14px;"></i> Borrar
+                                    </a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -111,6 +120,8 @@ include '../includes/header_admin.php';
         </div>
     </div>
 </div>
+
+<script>lucide.createIcons();</script>
 
 <?php 
 include '../includes/footer_admin.php'; 

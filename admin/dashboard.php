@@ -43,6 +43,9 @@ $datos_js = json_encode($adopciones_por_mes);
 include '../includes/header_admin.php'; 
 ?>
 
+<!-- CDN DE LUCIDE ICONS -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h2 text-brand fw-bold mb-0">Panel de Control NexAdopt</h1>
@@ -52,10 +55,13 @@ include '../includes/header_admin.php';
     </div>
     
     <div class="row g-4 mb-4">
+        <!-- TARJETA: Total Mascotas -->
         <div class="col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
                 <div class="d-flex align-items-center">
-                    <div class="icon-circle bg-light text-brand fs-2 me-3" style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">🐾</div>
+                    <div class="icon-circle bg-light text-brand fs-2 me-3" style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i data-lucide="paw-print" style="width:32px; height:32px;"></i>
+                    </div>
                     <div>
                         <h6 class="text-muted mb-0 small text-uppercase fw-bold">Mascotas en total</h6>
                         <span class="h2 fw-bold mb-0 text-dark"><?php echo $total_mascotas; ?></span>
@@ -64,10 +70,13 @@ include '../includes/header_admin.php';
             </div>
         </div>
 
+        <!-- TARJETA: Pendientes -->
         <div class="col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-warning border-4">
                 <div class="d-flex align-items-center">
-                    <div class="icon-circle bg-warning bg-opacity-10 text-warning fs-2 me-3" style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">📩</div>
+                    <div class="icon-circle bg-warning bg-opacity-10 text-warning fs-2 me-3" style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i data-lucide="mail" style="width:32px; height:32px;"></i>
+                    </div>
                     <div>
                         <h6 class="text-muted mb-0 small text-uppercase fw-bold">Pendientes de revisión</h6>
                         <span class="h2 fw-bold mb-0 text-warning"><?php echo $pendientes; ?></span>
@@ -76,10 +85,13 @@ include '../includes/header_admin.php';
             </div>
         </div>
 
+        <!-- TARJETA: Adoptados -->
         <div class="col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-success border-4">
                 <div class="d-flex align-items-center">
-                    <div class="icon-circle bg-success bg-opacity-10 text-success fs-2 me-3" style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">🏠</div>
+                    <div class="icon-circle bg-success bg-opacity-10 text-success fs-2 me-3" style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i data-lucide="home" style="width:32px; height:32px;"></i>
+                    </div>
                     <div>
                         <h6 class="text-muted mb-0 small text-uppercase fw-bold">Animales Adoptados</h6>
                         <span class="h2 fw-bold mb-0 text-success"><?php echo $adoptados; ?></span>
@@ -89,17 +101,20 @@ include '../includes/header_admin.php';
         </div>
     </div>
 
+    <!-- ACCIONES RÁPIDAS -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
                 <h5 class="fw-bold mb-4 d-flex align-items-center text-dark text-start">
-                    <span class="me-2">⚡</span> Acciones rápidas de gestión
+                    <i data-lucide="zap" class="me-2" style="width:20px; height:20px;"></i> Acciones rápidas de gestión
                 </h5>
                 <div class="row g-4">
                     <div class="col-md-4">
                         <a href="crear_mascotas.php" class="text-decoration-none">
                             <div class="p-4 border rounded-3 bg-light text-center hover-shadow transition h-100">
-                                <div class="fs-1 mb-2">➕</div>
+                                <div class="fs-1 mb-2 d-flex justify-content-center">
+                                    <i data-lucide="plus-circle" style="width:48px; height:48px;"></i>
+                                </div>
                                 <div class="fs-5 fw-bold text-dark">Añadir Nueva Mascota</div>
                             </div>
                         </a>
@@ -108,7 +123,9 @@ include '../includes/header_admin.php';
                     <div class="col-md-4">
                         <a href="solicitudes.php" class="text-decoration-none">
                             <div class="p-4 border rounded-3 bg-light text-center hover-shadow transition h-100">
-                                <div class="fs-1 mb-2">📋</div>
+                                <div class="fs-1 mb-2 d-flex justify-content-center">
+                                    <i data-lucide="clipboard-list" style="width:48px; height:48px;"></i>
+                                </div>
                                 <div class="fs-5 fw-bold text-dark">Revisar Solicitudes</div>
                             </div>
                         </a>
@@ -117,7 +134,9 @@ include '../includes/header_admin.php';
                     <div class="col-md-4">
                         <a href="crear_historia.php" class="text-decoration-none">
                             <div class="p-4 border rounded-3 bg-light text-center hover-shadow transition h-100">
-                                <div class="fs-1 mb-2">⭐</div>
+                                <div class="fs-1 mb-2 d-flex justify-content-center">
+                                    <i data-lucide="star" style="width:48px; height:48px;"></i>
+                                </div>
                                 <div class="fs-5 fw-bold text-dark">Añadir Nueva Historia</div>
                             </div>
                         </a>
@@ -127,10 +146,13 @@ include '../includes/header_admin.php';
         </div>
     </div>
 
+    <!-- GRÁFICO -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
-                <h5 class="fw-bold mb-4 text-brand">📈 Adopciones Aprobadas (<?php echo date('Y'); ?>)</h5>
+                <h5 class="fw-bold mb-4 text-brand d-flex align-items-center">
+                    <i data-lucide="trending-up" class="me-2" style="width:20px; height:20px;"></i> Adopciones Aprobadas (<?php echo date('Y'); ?>)
+                </h5>
                 <div style="height: 350px;">
                     <canvas id="graficoAdopciones"></canvas>
                 </div>
@@ -175,6 +197,9 @@ include '../includes/header_admin.php';
             }
         }
     });
+
+    // ACTIVAR TODOS LOS ICONOS LUCIDE
+    lucide.createIcons();
 </script>
 
 <?php 

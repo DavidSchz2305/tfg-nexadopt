@@ -32,8 +32,12 @@ include '../includes/header_admin.php';
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-brand mb-0">⭐ Inventario Total de Historias</h2>
-        <a href="crear_historia.php" class="btn btn-nexadopt">➕ Añadir Nueva</a>
+        <h2 class="fw-bold text-brand mb-0 d-flex align-items-center gap-2">
+            <i data-lucide="star" style="width:28px; height:28px;"></i> Inventario Total de Historias
+        </h2>
+        <a href="crear_historia.php" class="btn btn-nexadopt d-inline-flex align-items-center gap-2">
+            <i data-lucide="plus-circle" style="width:18px; height:18px;"></i> Añadir Nueva
+        </a>
     </div>
 
     <?php if(isset($_GET['msj']) && $_GET['msj'] == 'borrado'): ?>
@@ -75,15 +79,20 @@ include '../includes/header_admin.php';
                                     <?php echo (strlen($row['testimonio']) > 60) ? substr(htmlspecialchars($row['testimonio']), 0, 60) . '...' : htmlspecialchars($row['testimonio']); ?>
                                 </td>
                                 <td>
-                                    <div class="text-muted small fw-bold">
-                                        📅 <?php echo date("d/m/Y", strtotime($row['fecha_publicacion'])); ?>
+                                    <div class="text-muted small fw-bold d-flex align-items-center gap-1">
+                                        <i data-lucide="calendar" style="width:13px; height:13px;"></i>
+                                        <?php echo date("d/m/Y", strtotime($row['fecha_publicacion'])); ?>
                                     </div>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <a href="editar_historia.php?id=<?php echo $row['id_historia']; ?>" class="btn btn-sm btn-outline-primary border-0 me-2">✏️ Editar</a>
+                                    <a href="editar_historia.php?id=<?php echo $row['id_historia']; ?>" class="btn btn-sm btn-outline-primary border-0 me-2 d-inline-flex align-items-center gap-1">
+                                        <i data-lucide="pencil" style="width:14px; height:14px;"></i> Editar
+                                    </a>
                                     <a href="gestionar_historias.php?eliminar=<?php echo $row['id_historia']; ?>" 
-                                       class="btn btn-sm btn-outline-danger border-0" 
-                                       onclick="return confirm('¿Eliminar la historia de <?php echo htmlspecialchars($row['titulo']); ?>?')">🗑️ Borrar</a>
+                                       class="btn btn-sm btn-outline-danger border-0 d-inline-flex align-items-center gap-1"
+                                       onclick="return confirm('¿Eliminar la historia de <?php echo htmlspecialchars($row['titulo']); ?>?')">
+                                        <i data-lucide="trash-2" style="width:14px; height:14px;"></i> Borrar
+                                    </a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -95,6 +104,8 @@ include '../includes/header_admin.php';
         </div>
     </div>
 </div>
+
+<script>lucide.createIcons();</script>
 
 <?php 
 include '../includes/footer_admin.php'; 

@@ -46,13 +46,21 @@ include '../includes/header_admin.php';
 ?>
 
 <div class="container-fluid py-4">
-    <h2 class="fw-bold text-brand mb-4">📋 Gestión de Solicitudes</h2>
+    <h2 class="fw-bold text-brand mb-4 d-flex align-items-center gap-2">
+        <i data-lucide="clipboard-list" style="width:28px; height:28px;"></i> Gestión de Solicitudes
+    </h2>
 
     <div class="mb-4 d-flex gap-2">
         <a href="solicitudes.php?filtro=Todos" class="btn btn-sm <?= ($filtro == 'Todos') ? 'btn-dark' : 'btn-outline-dark' ?> rounded-pill px-3">Ver Todas</a>
-        <a href="solicitudes.php?filtro=Pendiente" class="btn btn-sm <?= ($filtro == 'Pendiente') ? 'btn-warning' : 'btn-outline-warning' ?> rounded-pill px-3">⏳ Pendientes</a>
-        <a href="solicitudes.php?filtro=Aprobado" class="btn btn-sm <?= ($filtro == 'Aprobado') ? 'btn-success' : 'btn-outline-success' ?> rounded-pill px-3">✅ Aprobadas</a>
-        <a href="solicitudes.php?filtro=Rechazado" class="btn btn-sm <?= ($filtro == 'Rechazado') ? 'btn-secondary' : 'btn-outline-secondary' ?> rounded-pill px-3">📁 Rechazadas</a>
+        <a href="solicitudes.php?filtro=Pendiente" class="btn btn-sm <?= ($filtro == 'Pendiente') ? 'btn-warning' : 'btn-outline-warning' ?> rounded-pill px-3 d-inline-flex align-items-center gap-1">
+            <i data-lucide="clock" style="width:14px; height:14px;"></i> Pendientes
+        </a>
+        <a href="solicitudes.php?filtro=Aprobado" class="btn btn-sm <?= ($filtro == 'Aprobado') ? 'btn-success' : 'btn-outline-success' ?> rounded-pill px-3 d-inline-flex align-items-center gap-1">
+            <i data-lucide="check-circle" style="width:14px; height:14px;"></i> Aprobadas
+        </a>
+        <a href="solicitudes.php?filtro=Rechazado" class="btn btn-sm <?= ($filtro == 'Rechazado') ? 'btn-secondary' : 'btn-outline-secondary' ?> rounded-pill px-3 d-inline-flex align-items-center gap-1">
+            <i data-lucide="folder" style="width:14px; height:14px;"></i> Rechazadas
+        </a>
     </div>
 
     <?= $mensaje_info ?>
@@ -67,7 +75,9 @@ include '../includes/header_admin.php';
                         </div>
                         <div class="col-md-5">
                             <h5 class="fw-bold mb-0"><?= htmlspecialchars($row['nombre_usuario']) ?> → <?= htmlspecialchars($row['nombre_mascota']) ?></h5>
-                            <span class="text-muted small">📅 <?= $row['fecha_solicitud'] ?></span>
+                            <span class="text-muted small d-inline-flex align-items-center gap-1">
+                                <i data-lucide="calendar" style="width:13px; height:13px;"></i> <?= $row['fecha_solicitud'] ?>
+                            </span>
                         </div>
                         <div class="col-md-2 text-center">
                             <span class="badge rounded-pill px-3 py-2 <?= ($row['estado_tramite'] == 'Aprobado') ? 'bg-success' : (($row['estado_tramite'] == 'Rechazado') ? 'bg-secondary' : 'bg-warning text-dark') ?>">
@@ -75,13 +85,17 @@ include '../includes/header_admin.php';
                             </span>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button class="btn btn-sm btn-outline-brand fw-bold me-2" type="button" data-bs-toggle="collapse" data-bs-target="#respuestas_<?= $row['id_solicitud'] ?>">
-                                 Ver Respuestas
+                            <button class="btn btn-sm btn-outline-brand fw-bold me-2 d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="collapse" data-bs-target="#respuestas_<?= $row['id_solicitud'] ?>">
+                                <i data-lucide="eye" style="width:14px; height:14px;"></i> Ver Respuestas
                             </button>
 
                             <?php if($row['estado_tramite'] == 'Pendiente'): ?>
-                                <a href="?accion=aprobar&id_solicitud=<?= $row['id_solicitud'] ?>&id_mascota=<?= $row['id_mascota'] ?>" class="btn btn-success btn-sm fw-bold">Aprobar</a>
-                                <a href="?accion=rechazar&id_solicitud=<?= $row['id_solicitud'] ?>&id_mascota=<?= $row['id_mascota'] ?>" class="btn btn-outline-danger btn-sm fw-bold">Rechazar</a>
+                                <a href="?accion=aprobar&id_solicitud=<?= $row['id_solicitud'] ?>&id_mascota=<?= $row['id_mascota'] ?>" class="btn btn-success btn-sm fw-bold d-inline-flex align-items-center gap-1">
+                                    <i data-lucide="check" style="width:14px; height:14px;"></i> Aprobar
+                                </a>
+                                <a href="?accion=rechazar&id_solicitud=<?= $row['id_solicitud'] ?>&id_mascota=<?= $row['id_mascota'] ?>" class="btn btn-outline-danger btn-sm fw-bold d-inline-flex align-items-center gap-1">
+                                    <i data-lucide="x" style="width:14px; height:14px;"></i> Rechazar
+                                </a>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -105,5 +119,7 @@ include '../includes/header_admin.php';
         <?php endwhile; ?>
     </div>
 </div>
+
+<script>lucide.createIcons();</script>
 
 <?php include '../includes/footer_admin.php'; ?>

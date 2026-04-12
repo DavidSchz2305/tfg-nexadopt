@@ -91,17 +91,23 @@ include '../includes/header_admin.php';
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="card border-0 shadow-sm rounded-4 p-5 bg-white">
-                <h2 class="fw-bold text-brand mb-4">🐾 Añadir Nueva Mascota</h2>
+                <h2 class="fw-bold text-brand mb-4 d-flex align-items-center gap-2">
+                    <i data-lucide="paw-print" style="width:28px; height:28px;"></i> Añadir Nueva Mascota
+                </h2>
                 <?= $mensaje ?>
 
                 <form action="crear_mascotas.php" method="POST" enctype="multipart/form-data">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Nombre</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="tag" style="width:14px; height:14px;"></i> Nombre
+                            </label>
                             <input type="text" name="nombre" class="form-control" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Especie</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="layers" style="width:14px; height:14px;"></i> Especie
+                            </label>
                             <select name="especie" class="form-select" required>
                                 <option value="Perro">Perro</option>
                                 <option value="Gato">Gato</option>
@@ -109,7 +115,9 @@ include '../includes/header_admin.php';
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Sexo</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="user" style="width:14px; height:14px;"></i> Sexo
+                            </label>
                             <select name="sexo" class="form-select">
                                 <option value="Macho">Macho</option>
                                 <option value="Hembra">Hembra</option>
@@ -117,22 +125,30 @@ include '../includes/header_admin.php';
                         </div>
                         
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Raza</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="git-branch" style="width:14px; height:14px;"></i> Raza
+                            </label>
                             <input type="text" name="raza" class="form-control" placeholder="Ej: Labrador, Mestizo...">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Edad (Valor)</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="calendar" style="width:14px; height:14px;"></i> Edad (Valor)
+                            </label>
                             <input type="number" name="edad_valor" class="form-control" required>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Unidad</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="clock" style="width:14px; height:14px;"></i> Unidad
+                            </label>
                             <select name="edad_unidad" class="form-select">
                                 <option value="años">Años</option>
                                 <option value="meses">Meses</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Tamaño</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="maximize-2" style="width:14px; height:14px;"></i> Tamaño
+                            </label>
                             <select name="tamanio" class="form-select">
                                 <option value="Pequeño">Pequeño</option>
                                 <option value="Mediano">Mediano</option>
@@ -141,19 +157,27 @@ include '../includes/header_admin.php';
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-bold">Descripción / Historia</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="file-text" style="width:14px; height:14px;"></i> Descripción / Historia
+                            </label>
                             <textarea name="descripcion" class="form-control" rows="4"></textarea>
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-bold">Fotos de la mascota (Hasta 10 imágenes)</label>
+                            <label class="form-label fw-bold d-flex align-items-center gap-1">
+                                <i data-lucide="image" style="width:14px; height:14px;"></i> Fotos de la mascota (Hasta 10 imágenes)
+                            </label>
                             <input type="file" name="fotos[]" class="form-control" accept="image/*" multiple required>
                             <small class="text-muted">Mantén pulsada la tecla CTRL para seleccionar varias fotos a la vez en tu ordenador.</small>
                         </div>
 
                         <div class="col-12 mt-4 text-end">
-                            <a href="dashboard.php" class="btn btn-outline-secondary px-4 me-2">Cancelar</a>
-                            <button type="submit" class="btn btn-nexadopt px-5">Guardar Mascota</button>
+                            <a href="dashboard.php" class="btn btn-outline-secondary px-4 me-2 d-inline-flex align-items-center gap-1">
+                                <i data-lucide="x" style="width:14px; height:14px;"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-nexadopt px-5 d-inline-flex align-items-center gap-2">
+                                <i data-lucide="save" style="width:16px; height:16px;"></i> Guardar Mascota
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -161,5 +185,7 @@ include '../includes/header_admin.php';
         </div>
     </div>
 </div>
+
+<script>lucide.createIcons();</script>
 
 <?php include '../includes/footer_admin.php'; ?>
