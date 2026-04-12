@@ -26,35 +26,55 @@ include 'includes/header.php';
         <div class="container text-center py-4">
             <div class="row row-cols-1 row-cols-md-5 g-4 justify-content-center">
                 
-                <div class="col"><div class="icon-box text-center p-3 rounded-4 h-100">
-                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">🐾</div>
-                    <h5 class="fw-semibold text-brand mb-1">Red de refugios</h5>
-                    <p class="small mb-0" style="color: #6a828a;">Colaboramos con centros de rescate</p>
-                </div></div>
+                <div class="col">
+                    <div class="icon-box text-center p-4 py-5 rounded-4 h-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="icon-circle d-inline-flex align-items-center justify-content-center mb-4 rounded-circle" style="width: 80px; height: 80px;">
+                            <img src="assets/icons/ICON-Refugio.png" alt="Icono Refugio" style="width: 42px; height: 42px; object-fit: contain;">
+                        </div>
+                        <h5 class="fw-semibold text-brand mb-2">Red de refugios</h5>
+                        <p class="small mb-0" style="color: #6a828a;">Colaboramos con centros de rescate</p>
+                    </div>
+                </div>
 
-                <div class="col"><div class="icon-box text-center p-3 rounded-4 h-100">
-                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">❤️</div>
-                    <h5 class="fw-semibold text-brand mb-1">Cuidados y salud</h5>
-                    <p class="small mb-0" style="color: #6a828a;">Garantizamos el bienestar animal</p>
-                </div></div>
+                <div class="col">
+                    <div class="icon-box text-center p-4 py-5 rounded-4 h-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="icon-circle d-inline-flex align-items-center justify-content-center mb-4 rounded-circle" style="width: 80px; height: 80px;">
+                            <img src="assets/icons/ICON-Cuidados.png" alt="Icono Cuidados" style="width: 42px; height: 42px; object-fit: contain;">
+                        </div>
+                        <h5 class="fw-semibold text-brand mb-2">Cuidados y salud</h5>
+                        <p class="small mb-0" style="color: #6a828a;">Garantizamos el bienestar animal</p>
+                    </div>
+                </div>
 
-                <div class="col"><div class="icon-box text-center p-3 rounded-4 h-100">
-                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">📜</div>
-                    <h5 class="fw-semibold text-brand mb-1">Proceso de adopción</h5>
-                    <p class="small mb-0" style="color: #6a828a;">Transparente y paso a paso</p>
-                </div></div>
+                <div class="col">
+                    <div class="icon-box text-center p-4 py-5 rounded-4 h-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="icon-circle d-inline-flex align-items-center justify-content-center mb-4 rounded-circle" style="width: 80px; height: 80px;">
+                            <img src="assets/icons/ICON-Adopta.png" alt="Icono Proceso de Adopción" style="width: 42px; height: 42px; object-fit: contain;">
+                        </div>
+                        <h5 class="fw-semibold text-brand mb-2">Proceso de adopción</h5>
+                        <p class="small mb-0" style="color: #6a828a;">Transparente y paso a paso</p>
+                    </div>
+                </div>
 
-                <div class="col"><div class="icon-box text-center p-3 rounded-4 h-100">
-                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">💳</div>
-                    <h5 class="fw-semibold text-brand mb-1">Haz tu donativo</h5>
-                    <p class="small mb-0" style="color: #6a828a;">Ayúdanos a salvar vidas</p>
-                </div></div>
+                <div class="col">
+                    <div class="icon-box text-center p-4 py-5 rounded-4 h-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="icon-circle d-inline-flex align-items-center justify-content-center mb-4 rounded-circle" style="width: 80px; height: 80px;">
+                            <img src="assets/icons/ICON-Donar.png" alt="Icono Donar" style="width: 42px; height: 42px; object-fit: contain;">
+                        </div>
+                        <h5 class="fw-semibold text-brand mb-2">Haz tu donativo</h5>
+                        <p class="small mb-0" style="color: #6a828a;">Ayúdanos a salvar vidas</p>
+                    </div>
+                </div>
 
-                <div class="col"><div class="icon-box text-center p-3 rounded-4 h-100">
-                    <div class="icon-circle d-inline-flex align-items-center justify-content-center fs-2 mb-3 rounded-circle" style="width: 70px; height: 70px;">🤝</div>
-                    <h5 class="fw-semibold text-brand mb-1">Dar en adopción</h5>
-                    <p class="small mb-0" style="color: #6a828a;">Encuentra a la familia ideal</p>
-                </div></div>
+                <div class="col">
+                    <div class="icon-box text-center p-4 py-5 rounded-4 h-100 d-flex flex-column justify-content-center align-items-center">
+                        <div class="icon-circle d-inline-flex align-items-center justify-content-center mb-4 rounded-circle" style="width: 80px; height: 80px;">
+                            <img src="assets/icons/ICON-Acogida.png" alt="Icono Acogida" style="width: 42px; height: 42px; object-fit: contain;">
+                        </div>
+                        <h5 class="fw-semibold text-brand mb-2">Familia de acogida</h5>
+                        <p class="small mb-0" style="color: #6a828a;">Conviértete en familia de acogida</p>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -66,11 +86,27 @@ include 'includes/header.php';
                 <div class="col-lg-8">
                     <div class="mb-4">
                             <img src="assets/img/header_footer/logo_transparente.png" alt="NexAdopt Logo" class="img-fluid" style="max-height: 45px; margin-top: 2px;" loading="lazy">
-                        <h2 class="display-5 fw-bold text-brand">¿Quiénes somos?</h2>
+                        <h2 class="display-5 fw-bold text-brand mt-3">¿Quiénes somos?</h2>
                     </div>
                     <p class="lead mb-4 px-lg-5" style="color: #4a5d63;">Somos una plataforma digital innovadora dedicada a transformar el proceso de adopción animal. NexAdopt une el esfuerzo incansable de protectoras y refugios con personas comprometidas, garantizando adopciones responsables, seguras y transparentes para que cada animal reciba el hogar que merece.</p>
                     <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                         <a href="nosotros.php" class="btn btn-outline-nexadopt btn-lg px-4">Conoce nuestra historia</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="video-promo-section py-5 bg-verde-claro">
+        <div class="container py-4">
+            <h2 class="fw-bold text-center mb-5 text-brand">5 Razones para Adoptar</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-lg border border-3 border-white">
+                        <video controls autoplay muted loop playsinline>
+                            <source src="assets/video/video-nextadopt.mp4" type="video/mp4">
+                            Tu navegador no soporta la reproducción de vídeos.
+                        </video>
                     </div>
                 </div>
             </div>
