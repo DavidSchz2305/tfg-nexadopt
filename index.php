@@ -9,7 +9,7 @@ include 'includes/header.php';
         <div class="container py-lg-5">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
-                    <img src="assets/img/inicio/Perros-familia-feliz.jpg" class="d-block mx-lg-auto img-fluid rounded-4 shadow-lg" alt="Perros y gatos felices esperando adopción">
+                    <img src="assets/img/inicio/Perros-familia-feliz.webp" class="d-block mx-lg-auto img-fluid rounded-4 shadow-lg" alt="Perros y gatos felices esperando adopción">
                 </div>
                 <div class="col-lg-6">
                     <h1 class="display-4 fw-bold lh-1 mb-3 text-brand">Dale un giro a tu vida: adopta a un amigo</h1>
@@ -120,7 +120,7 @@ include 'includes/header.php';
                 
                 <div class="col-lg-4 col-md-12">
                     <div class="card card-nexadopt h-100 shadow-sm rounded-4 overflow-hidden d-flex flex-column">
-                        <img src="assets/img/inicio/Entrenamiento-perros.jpg" class="card-img-top" alt="Entrenamiento" style="height: 300px; object-fit: cover;" loading="lazy">
+                        <img src="assets/img/inicio/Entrenamiento-perros.webp" class="card-img-top" alt="Entrenamiento" style="height: 300px; object-fit: cover;" loading="lazy">
                         <div class="card-body text-center d-flex flex-column justify-content-center p-4 flex-grow-1">
                             <h5 class="card-title fw-bold text-brand">Guía de apoyo integral para el comportamiento y adiestramiento en casa</h5>
                             <div class="mt-4">
@@ -134,19 +134,19 @@ include 'includes/header.php';
                     <div class="d-flex flex-column h-100 gap-3">
                         <div class="card card-nexadopt shadow-sm rounded-3 p-2 flex-grow-1 d-flex justify-content-center">
                             <div class="row g-0 align-items-center w-100">
-                                <div class="col-4"><img src="assets/img/consejos/Perro-reactivo.jpg" class="img-fluid rounded-3" alt="Perro reactivo" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
+                                <div class="col-4"><img src="assets/img/consejos/Perro-reactivo.webp" class="img-fluid rounded-3" alt="Perro reactivo" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
                                 <div class="col-8"><div class="card-body py-1 px-3"><p class="card-text fw-semibold text-brand mb-0">Identifica las señales de reactividad en tu perro</p></div></div>
                             </div>
                         </div>
                         <div class="card card-nexadopt shadow-sm rounded-3 p-2 flex-grow-1 d-flex justify-content-center">
                             <div class="row g-0 align-items-center w-100">
-                                <div class="col-4"><img src="assets/img/consejos/Entrenamiento-cachorros.jpg" class="img-fluid rounded-3" alt="Entrenamiento cachorros" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
+                                <div class="col-4"><img src="assets/img/consejos/Entrenamiento-cachorros.webp" class="img-fluid rounded-3" alt="Entrenamiento cachorros" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
                                 <div class="col-8"><div class="card-body py-1 px-3"><p class="card-text fw-semibold text-brand mb-0">Guía básica de adiestramiento para cachorros</p></div></div>
                             </div>
                         </div>
                         <div class="card card-nexadopt shadow-sm rounded-3 p-2 flex-grow-1 d-flex justify-content-center">
                             <div class="row g-0 align-items-center w-100">
-                                <div class="col-4"><img src="assets/img/consejos/Como-entrenar-perro.jpg" class="img-fluid rounded-3" alt="Entrenar perro" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
+                                <div class="col-4"><img src="assets/img/consejos/Como-entrenar-perro.webp" class="img-fluid rounded-3" alt="Entrenar perro" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
                                 <div class="col-8"><div class="card-body py-1 px-3"><p class="card-text fw-semibold text-brand mb-0">Consejos clave para educar a tu perro en positivo</p></div></div>
                             </div>
                         </div>
@@ -157,19 +157,19 @@ include 'includes/header.php';
                     <div class="d-flex flex-column h-100 gap-3">
                         <div class="card card-nexadopt shadow-sm rounded-3 p-2 flex-grow-1 d-flex justify-content-center">
                             <div class="row g-0 align-items-center w-100">
-                                <div class="col-4"><img src="assets/img/consejos/Perro-ladre.jpg" class="img-fluid rounded-3" alt="Perro ladrando" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
+                                <div class="col-4"><img src="assets/img/consejos/Perro-ladre.webp" class="img-fluid rounded-3" alt="Perro ladrando" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
                                 <div class="col-8"><div class="card-body py-1 px-3"><p class="card-text fw-semibold text-brand mb-0">Técnicas eficaces para gestionar los ladridos</p></div></div>
                             </div>
                         </div>
                         <div class="card card-nexadopt shadow-sm rounded-3 p-2 flex-grow-1 d-flex justify-content-center">
                             <div class="row g-0 align-items-center w-100">
-                                <div class="col-4"><img src="assets/img/consejos/Evitar_perro-muerda.jpg" class="img-fluid rounded-3" alt="Perro mordiendo" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
+                                <div class="col-4"><img src="assets/img/consejos/Evitar_perro-muerda.webp" class="img-fluid rounded-3" alt="Perro mordiendo" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
                                 <div class="col-8"><div class="card-body py-1 px-3"><p class="card-text fw-semibold text-brand mb-0">Cómo prevenir y corregir mordidas indeseadas</p></div></div>
                             </div>
                         </div>
                         <div class="card card-nexadopt shadow-sm rounded-3 p-2 flex-grow-1 d-flex justify-content-center">
                             <div class="row g-0 align-items-center w-100">
-                                <div class="col-4"><img src="assets/img/consejos/Presentar-nuevo-perro.jpg" class="img-fluid rounded-3" alt="Presentar perros" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
+                                <div class="col-4"><img src="assets/img/consejos/Presentar-nuevo-perro.webp" class="img-fluid rounded-3" alt="Presentar perros" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
                                 <div class="col-8"><div class="card-body py-1 px-3"><p class="card-text fw-semibold text-brand mb-0">Pasos para presentar a tu nuevo perro a la familia</p></div></div>
                             </div>
                         </div>
@@ -189,13 +189,13 @@ include 'includes/header.php';
                     <div class="d-flex flex-column h-100 gap-3">
                         <div class="card card-nexadopt shadow-sm rounded-3 p-2 bg-white flex-grow-1 d-flex justify-content-center">
                             <div class="row g-0 align-items-center w-100">
-                                <div class="col-5"><img src="assets/img/historias/Tyson.jpg" class="img-fluid rounded-3" alt="Tyson" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
+                                <div class="col-5"><img src="assets/img/historias/Tyson.webp" class="img-fluid rounded-3" alt="Tyson" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
                                 <div class="col-7"><div class="card-body py-1 px-3"><p class="card-text fw-bold text-brand mb-0">Tyson por fin disfruta de la calidez de un hogar.</p></div></div>
                             </div>
                         </div>
                         <div class="card card-nexadopt shadow-sm rounded-3 p-2 bg-white flex-grow-1 d-flex justify-content-center">
                             <div class="row g-0 align-items-center w-100">
-                                <div class="col-5"><img src="assets/img/historias/Toby.jpg" class="img-fluid rounded-3" alt="Toby" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
+                                <div class="col-5"><img src="assets/img/historias/Toby.webp" class="img-fluid rounded-3" alt="Toby" style="aspect-ratio: 1/1; object-fit: cover;" loading="lazy"></div>
                                 <div class="col-7"><div class="card-body py-1 px-3"><p class="card-text fw-bold text-brand mb-0">La tercera fue la vencida: Toby ya tiene una familia.</p></div></div>
                             </div>
                         </div>
@@ -207,7 +207,7 @@ include 'includes/header.php';
 
                 <div class="col-lg-4 col-md-6">
                     <div class="card card-nexadopt h-100 shadow-sm rounded-4 overflow-hidden bg-white d-flex flex-column">
-                        <img src="assets/img/historias/Lia.jpg" class="card-img-top" alt="Lia" style="height: 280px; object-fit: cover; object-position: center;" loading="lazy">
+                        <img src="assets/img/historias/Lia.webp" class="card-img-top" alt="Lia" style="height: 280px; object-fit: cover; object-position: center;" loading="lazy">
                         <div class="card-body d-flex flex-column p-4 text-center flex-grow-1">
                             <p class="card-text text-brand fw-medium mb-4">Lia, la perrita que era invisible en el refugio, se ha convertido en la indiscutible reina de su nueva casa.</p>
                             <div class="mt-auto">
@@ -219,7 +219,7 @@ include 'includes/header.php';
 
                 <div class="col-lg-4 col-md-6">
                     <div class="card card-nexadopt h-100 shadow-sm rounded-4 overflow-hidden bg-white d-flex flex-column">
-                        <img src="assets/img/historias/Thor.jpg" class="card-img-top" alt="Thor" style="height: 280px; object-fit: cover; object-position: center;" loading="lazy">
+                        <img src="assets/img/historias/Thor.webp" class="card-img-top" alt="Thor" style="height: 280px; object-fit: cover; object-position: center;" loading="lazy">
                         <div class="card-body d-flex flex-column p-4 text-center flex-grow-1">
                             <p class="card-text text-brand fw-medium mb-4">Tras un largo proceso de recuperación, el valiente Thor ya descansa tranquilo en su propio sofá familiar.</p>
                             <div class="mt-auto">
