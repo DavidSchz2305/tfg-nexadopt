@@ -13,7 +13,7 @@ $lista_imagenes = [];
 if (is_dir($directorio_imagenes)) {
     $archivos = scandir($directorio_imagenes);
     foreach ($archivos as $archivo) {
-        if ($archivo != '.' && $archivo != '..' && preg_match('/\.(jpg|jpeg|png|gif)$/i', $archivo)) {
+        if ($archivo != '.' && $archivo != '..' && preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $archivo)) {
             $lista_imagenes[] = $archivo;
         }
     }
