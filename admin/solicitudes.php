@@ -102,31 +102,6 @@ try {
     error_log('[NexAdopt - Solicitudes/List Error] ' . $e->getMessage());
 }
 
-// =========================================================================
-// PRECARGA DE RESPUESTAS DEL CUESTIONARIO
-// =========================================================================
-$todas_respuestas = [];
-if (!empty($solicitudes)) {
-    try {
-        $ids_visibles = array_column($solicitudes, 'id_solicitud');
-        $placeholders = implode(',', array_fill(0, count($ids_visibles), '?'));
-
-        $stmt_resp = $conexion->prepare(
-            "SELECT id_solicitud, pregunta, respuesta 
-             FROM Respuestas_Adopcion 
-             WHERE id_solicitud IN ($placeholders) 
-             ORDER BY id"
-        );
-        $stmt_resp->execute($ids_visibles);
-
-        foreach ($stmt_resp->fetchAll() as $resp) {
-            $todas_respuestas[$resp['id_solicitud']][] = $resp;
-        }
-    } catch (PDOException $e) {
-        error_log('[NexAdopt - Solicitudes/Respuestas Error] ' . $e->getMessage());
-    }
-}
-
 include '../includes/header_admin.php';
 ?>
 
@@ -214,7 +189,11 @@ include '../includes/header_admin.php';
                             <div class="row g-2 p-3 bg-light rounded-3 border">
                                 <h6 class="fw-bold small text-muted mb-3 text-uppercase">Cuestionario de Pre-Adopción Detallado:</h6>
                                 <?php
-                                $respuestas_solicitud = $todas_respuestas[$id_s] ?? [];
+                                // MODIFICACIÓN CLAVE: Consulta directa a la base de datos por cada solicitud
+                                $stmt_r = $conexion->prepare("SELECT pregunta, respuesta FROM Respuestas_Adopcion WHERE id_solicitud = ?");
+                                $stmt_r->execute([$id_s]);
+                                $respuestas_solicitud = $stmt_r->fetchAll(PDO::FETCH_ASSOC);
+
                                 if (!empty($respuestas_solicitud)):
                                     foreach ($respuestas_solicitud as $r): ?>
                                         <div class="col-md-6 border-bottom border-white py-2">
