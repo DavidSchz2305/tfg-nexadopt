@@ -1,4 +1,11 @@
 <?php
+/**
+ * Formulario de contacto que almacena los mensajes en la tabla `mensajes_contacto`.
+ * He usado una sentencia preparada con parámetros nombrados para la inserción,
+ * lo que elimina cualquier riesgo de inyección SQL independientemente del contenido
+ * que el usuario escriba en el campo de mensaje.
+ */
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -6,45 +13,46 @@ require_once 'config/conexion.php';
 include 'includes/header.php';
 
 $mensaje_enviado = false;
-$error_mensaje = "";
+$error_mensaje   = '';
 
-// Procesar el formulario solo si se ha enviado por POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // Recoger y limpiar los datos del formulario
-    $nombre = trim($_POST['nombre'] ?? '');
-    $telefono = trim($_POST['telefono'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $asunto = trim($_POST['asunto'] ?? '');
-    $mensaje = trim($_POST['mensaje'] ?? '');
-    // Verificamos si se ha marcado el checkbox de términos legales
-    $terminos_aceptados = isset($_POST['terminos']) ? true : false;
-    
-    // Validar que los campos obligatorios no estén vacíos y que se han aceptado los términos
-    if (!empty($nombre) && !empty($email) && !empty($asunto) && !empty($mensaje)) {
-        if ($terminos_aceptados) {
-            // Preparar la consulta SQL para evitar inyecciones SQL
-            $sql = "INSERT INTO mensajes_contacto (nombre, telefono, email, asunto, mensaje) VALUES (?, ?, ?, ?, ?)";
-            
-            if ($stmt = $conexion->prepare($sql)) {
-                // Vinculamos los parámetros
-                $stmt->bind_param("sssss", $nombre, $telefono, $email, $asunto, $mensaje);
-                
-                // Ejecutamos la consulta
-                if ($stmt->execute()) {
-                    $mensaje_enviado = true;
-                } else {
-                    $error_mensaje = "Lo sentimos, hubo un error técnico al guardar tu mensaje.";
-                }
-                $stmt->close();
-            } else {
-                $error_mensaje = "Error al conectar con la base de datos.";
-            }
-        } else {
-            $error_mensaje = "Debes aceptar la Política de Privacidad para poder enviar el mensaje.";
-        }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Recogemos y limpiamos los datos del formulario.
+    $nombre             = trim($_POST['nombre']    ?? '');
+    $telefono           = trim($_POST['telefono']  ?? '');
+    $email              = trim($_POST['email']     ?? '');
+    $asunto             = trim($_POST['asunto']    ?? '');
+    $mensaje            = trim($_POST['mensaje']   ?? '');
+    $terminos_aceptados = isset($_POST['terminos']);
+
+    // Validamos antes de ejecutar cualquier operación en la BD.
+    if (empty($nombre) || empty($email) || empty($asunto) || empty($mensaje)) {
+        $error_mensaje = 'Por favor, rellena todos los campos obligatorios.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        // Añado una validación extra de formato de email que no existía en la versión original.
+        $error_mensaje = 'El formato del correo electrónico no es válido.';
+    } elseif (!$terminos_aceptados) {
+        $error_mensaje = 'Debes aceptar la Política de Privacidad para poder enviar el mensaje.';
     } else {
-        $error_mensaje = "Por favor, rellena todos los campos obligatorios.";
+        try {
+            $sql = "INSERT INTO mensajes_contacto (nombre, telefono, email, asunto, mensaje) 
+                    VALUES (:nombre, :telefono, :email, :asunto, :mensaje)";
+            
+            $stmt = $conexion->prepare($sql);
+            $stmt->execute([
+                ':nombre'   => $nombre,
+                ':telefono' => $telefono ?: null,
+                ':email'    => $email,
+                ':asunto'   => $asunto,
+                ':mensaje'  => $mensaje,
+            ]);
+
+            $mensaje_enviado = true;
+
+        } catch (PDOException $e) {
+            error_log('[NexAdopt - Contacto Error] ' . $e->getMessage());
+            $error_mensaje = 'Lo sentimos, hubo un error técnico al guardar tu mensaje. Por favor, inténtalo de nuevo.';
+        }
     }
 }
 ?>
@@ -62,27 +70,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
 
-        <?php if($mensaje_enviado): ?>
+        <?php if ($mensaje_enviado): ?>
         <div class="row justify-content-center mb-4">
             <div class="col-lg-10">
                 <div class="alert alert-success d-flex align-items-center rounded-3 border-0 shadow-sm" role="alert">
                     <i class="fas fa-check-circle fs-4 me-3"></i>
-                    <div>
-                        <strong>¡Mensaje enviado con éxito!</strong> Nos pondremos en contacto contigo muy pronto.
-                    </div>
+                    <div><strong>¡Mensaje enviado con éxito!</strong> Nos pondremos en contacto contigo muy pronto.</div>
                 </div>
             </div>
         </div>
         <?php endif; ?>
 
-        <?php if(!empty($error_mensaje)): ?>
+        <?php if (!empty($error_mensaje)): ?>
         <div class="row justify-content-center mb-4">
             <div class="col-lg-10">
                 <div class="alert alert-danger d-flex align-items-center rounded-3 border-0 shadow-sm" role="alert">
                     <i class="fas fa-exclamation-triangle fs-4 me-3"></i>
-                    <div>
-                        <strong>¡Atención!</strong> <?php echo $error_mensaje; ?>
-                    </div>
+                    <div><strong>¡Atención!</strong> <?= htmlspecialchars($error_mensaje) ?></div>
                 </div>
             </div>
         </div>
@@ -127,11 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="rounded-3 overflow-hidden mt-4 shadow-sm border" style="height: 250px;">
                         <iframe 
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12128.530653655474!2d-3.6334651030064245!3d40.53866299863481!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422e1cae3d5fcb%3A0xbc70fdebb6d34e6e!2sParque%20Comercial%20R%C3%ADo%20Norte!5e0!3m2!1ses!2ses!4v1712760000000!5m2!1ses!2ses" 
-                            width="100%" 
-                            height="100%" 
-                            style="border:0;" 
-                            allowfullscreen="" 
-                            loading="lazy" 
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" 
                             referrerpolicy="no-referrer-when-downgrade">
                         </iframe>
                     </div>

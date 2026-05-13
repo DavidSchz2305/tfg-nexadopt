@@ -1,46 +1,66 @@
 <?php
+/**
+ * Formulario para publicar nuevas historias de adopción exitosa.
+ * La foto se selecciona de las imágenes ya subidas al servidor,
+ * por lo que no hay upload aquí, solo una inserción en BD.
+ */
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 1) {
-    header("Location: ../index.php");
+if (!isset($_SESSION['rol']) || (int)$_SESSION['rol'] !== 1) {
+    header('Location: ../index.php');
     exit();
 }
 
 require_once '../config/conexion.php';
 
-// Lector de carpeta para mostrar imágenes disponibles al crear/editar historia
+// Escaneamos el directorio de imágenes para rellenar el selector del formulario.
 $directorio_imagenes = '../assets/img/historias/';
 $lista_imagenes = [];
 if (is_dir($directorio_imagenes)) {
-    $archivos = scandir($directorio_imagenes);
-    foreach ($archivos as $archivo) {
-        if ($archivo != '.' && $archivo != '..' && preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $archivo)) {
+    foreach (scandir($directorio_imagenes) as $archivo) {
+        if ($archivo !== '.' && $archivo !== '..' && preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $archivo)) {
             $lista_imagenes[] = $archivo;
         }
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $titulo = trim($_POST['titulo']);
-    $testimonio = trim($_POST['testimonio']);
-    $foto_url = !empty($_POST['foto_seleccionada']) ? 'assets/img/historias/' . $_POST['foto_seleccionada'] : '';
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $titulo     = trim($_POST['titulo']     ?? '');
+    $testimonio = trim($_POST['testimonio'] ?? '');
+    // Construimos la ruta relativa solo si se ha seleccionado una imagen del desplegable.
+    $foto_url   = !empty($_POST['foto_seleccionada'])
+        ? 'assets/img/historias/' . basename($_POST['foto_seleccionada'])
+        : '';
 
     if (!empty($titulo) && !empty($testimonio)) {
-        $sql = "INSERT INTO historias_exito (titulo, testimonio, foto_final_url) VALUES (?, ?, ?)";
-        if ($stmt = $conexion->prepare($sql)) {
-            $stmt->bind_param("sss", $titulo, $testimonio, $foto_url);
-            if ($stmt->execute()) {
-                header("Location: gestionar_historias.php");
-                exit();
-            }
-            $stmt->close();
+        try {
+            
+            $sql  = "INSERT INTO historias_exito (titulo, testimonio, foto_final_url) VALUES (:titulo, :testimonio, :foto)";
+            $stmt = $conexion->prepare($sql);
+            $stmt->execute([
+                ':titulo'     => $titulo,
+                ':testimonio' => $testimonio,
+                ':foto'       => $foto_url,
+            ]);
+
+            header('Location: gestionar_historias.php');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log('[NexAdopt - CrearHistoria Error] ' . $e->getMessage());
+            $error = 'No se pudo guardar la historia. Por favor, inténtalo de nuevo.';
         }
+    } else {
+        $error = 'El título y el testimonio son obligatorios.';
     }
 }
 
-include '../includes/header_admin.php'; 
+include '../includes/header_admin.php';
 ?>
 
 <div class="container-fluid py-4">
@@ -52,6 +72,10 @@ include '../includes/header_admin.php';
             <i data-lucide="star" style="width:28px; height:28px;"></i> Añadir Nueva Historia
         </h2>
     </div>
+
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
     <div class="row">
         <div class="col-lg-8">
@@ -71,8 +95,8 @@ include '../includes/header_admin.php';
                         </label>
                         <select name="foto_seleccionada" class="form-select form-select-lg bg-light border-0" style="cursor: pointer;">
                             <option value="">-- Selecciona imagen de la carpeta --</option>
-                            <?php foreach($lista_imagenes as $img): ?>
-                                <option value="<?php echo htmlspecialchars($img); ?>"> <?php echo htmlspecialchars($img); ?></option>
+                            <?php foreach ($lista_imagenes as $img): ?>
+                                <option value="<?= htmlspecialchars($img) ?>"><?= htmlspecialchars($img) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

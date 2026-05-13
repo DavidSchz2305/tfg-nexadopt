@@ -1,23 +1,30 @@
 <?php
+/**
+ * Vista detallada de una mascota específica y punto de entrada al proceso de adopción.
+ */
+
 session_start();
 include 'includes/header.php';
 require_once 'config/conexion.php';
 
-// RECOGER EL ID DE LA MASCOTA
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header("Location: adoptar.php");
+// Validamos que el ID exista y sea numérico
+if (!isset($_GET['id']) || !ctype_digit($_GET['id']) || (int)$_GET['id'] <= 0) {
+    header('Location: adoptar.php');
     exit();
 }
 
-$id_mascota = $conexion->real_escape_string($_GET['id']);
+$id_mascota = (int)$_GET['id'];
+$mascota    = null;
 
-// BUSCAR LOS DATOS
-$sql = "SELECT * FROM Mascotas WHERE id_mascota = '$id_mascota'";
-$resultado = $conexion->query($sql);
+try {
+    $stmt = $conexion->prepare("SELECT * FROM Mascotas WHERE id_mascota = :id LIMIT 1");
+    $stmt->execute([':id' => $id_mascota]);
+    $mascota = $stmt->fetch();
+} catch (PDOException $e) {
+    error_log('[NexAdopt - PerfilMascota Error] ' . $e->getMessage());
+}
 
-if ($resultado && $resultado->num_rows > 0) {
-    $mascota = $resultado->fetch_assoc();
-} else {
+if (!$mascota) {
     echo '<div class="container py-5 text-center">
             <h2 class="text-brand">Mascota no encontrada</h2>
             <p>Lo sentimos, esta mascota no existe en nuestros registros.</p>
@@ -27,44 +34,57 @@ if ($resultado && $resultado->num_rows > 0) {
     exit();
 }
 
-// ETIQUETA DE ESTADO VISUAL
-$badge_estado = '<span class="badge bg-success px-3 py-2 rounded-pill shadow-sm fs-6">Disponible</span>';
+// Determinamos el badge de estado
+$badge_estado  = '<span class="badge bg-success px-3 py-2 rounded-pill shadow-sm fs-6">Disponible</span>';
 $puede_adoptar = true;
 
-if ($mascota['estado'] == 'En proceso') {
-    $badge_estado = '<span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm fs-6">En trámite</span>';
-} elseif ($mascota['estado'] == 'Adoptado') {
-    $badge_estado = '<span class="badge bg-secondary px-3 py-2 rounded-pill shadow-sm fs-6">Adoptado</span>';
-    $puede_adoptar = false; 
+if ($mascota['estado'] === 'En proceso') {
+    $badge_estado  = '<span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm fs-6">En trámite</span>';
+} elseif ($mascota['estado'] === 'Adoptado') {
+    $badge_estado  = '<span class="badge bg-secondary px-3 py-2 rounded-pill shadow-sm fs-6">Adoptado</span>';
+    $puede_adoptar = false;
 }
 
-/* Cogemos los datos de la carpeta que se ha generado con el nombre*/
+// =====================================================================
+// Comprobar si el usuario actual ya solicitó este perro
+// =====================================================================
+$ya_solicitado = false;
+if (isset($_SESSION['id_usuario'])) {
+    try {
+        $stmt_check = $conexion->prepare("SELECT id_solicitud FROM Solicitudes_Adopcion WHERE id_usuario = :id_user AND id_mascota = :id_mascota LIMIT 1");
+        $stmt_check->execute([
+            ':id_user' => $_SESSION['id_usuario'],
+            ':id_mascota' => $id_mascota
+        ]);
+        if ($stmt_check->fetch()) {
+            $ya_solicitado = true; // Si encuentra un registro, es que ya lo pidió
+        }
+    } catch (PDOException $e) {
+        error_log('[NexAdopt - Check Solicitud Error] ' . $e->getMessage());
+    }
+}
 
-$foto_db = $mascota['foto_url'];
-$ruta_base = "assets/img/mascotas/";
+// Lógica de galería de imágenes
+$foto_db      = $mascota['foto_url'];
+$ruta_base    = 'assets/img/mascotas/';
 $fotos_galeria = [];
 
-// Verificamos si la foto guardada está dentro de una carpeta (tiene una barra '/')
 if (strpos($foto_db, '/') !== false) {
-    $carpeta = dirname($foto_db); // Extrae el nombre de la carpeta (ej: "Lia_12345")
-    $ruta_directorio = $ruta_base . $carpeta . "/";
-    
-    // Escaneamos la carpeta buscando todas las imágenes
+    $carpeta         = dirname($foto_db);
+    $ruta_directorio = $ruta_base . $carpeta . '/';
+
     if (is_dir($ruta_directorio)) {
-        // glob() busca archivos que coincidan con la extensión
-        $archivos = glob($ruta_directorio . "*.{jpg,jpeg,png,webp,gif}", GLOB_BRACE);
+        $archivos = glob($ruta_directorio . '*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE);
         foreach ($archivos as $archivo) {
             $fotos_galeria[] = $archivo;
         }
     }
 }
 
-// Si la carpeta está vacía o es una mascota antigua sin carpeta, usamos la foto por defecto
 if (empty($fotos_galeria)) {
     $fotos_galeria[] = $ruta_base . htmlspecialchars($foto_db);
 }
 
-// La primera foto de la carpeta será siempre la principal
 $foto_principal = $fotos_galeria[0];
 ?>
 
@@ -84,15 +104,21 @@ $foto_principal = $fotos_galeria[0];
                 </div>
 
                 <div class="position-sticky" style="top: 100px;">
-                    <a href="<?= $foto_principal ?>" data-fslightbox="mascota-galeria">
-                        <img src="<?= $foto_principal ?>" alt="<?= htmlspecialchars($mascota['nombre']) ?>" class="img-fluid rounded-4 shadow-sm w-100 object-fit-cover border border-c2 mb-3 cursor-zoom-in" style="max-height: 500px;">
+                    <a href="<?= htmlspecialchars($foto_principal) ?>" data-fslightbox="mascota-galeria">
+                        <img src="<?= htmlspecialchars($foto_principal) ?>"
+                             alt="<?= htmlspecialchars($mascota['nombre']) ?>"
+                             class="img-fluid rounded-4 shadow-sm w-100 object-fit-cover border border-c2 mb-3 cursor-zoom-in"
+                             style="max-height: 500px;">
                     </a>
 
                     <div class="row g-2">
-                        <?php foreach($fotos_galeria as $index => $ruta_foto): ?>
+                        <?php foreach ($fotos_galeria as $index => $ruta_foto): ?>
                             <div class="col-4">
-                                <a href="<?= $ruta_foto ?>" data-fslightbox="mascota-galeria">
-                                    <img src="<?= $ruta_foto ?>" alt="Vista <?= $index+1 ?>" class="img-fluid rounded-3 shadow-sm w-100 galeria-miniatura <?= ($index == 0) ? '' : 'opacity-75' ?>" style="height: 120px; object-fit: cover;">
+                                <a href="<?= htmlspecialchars($ruta_foto) ?>" data-fslightbox="mascota-galeria">
+                                    <img src="<?= htmlspecialchars($ruta_foto) ?>"
+                                         alt="Vista <?= $index + 1 ?>"
+                                         class="img-fluid rounded-3 shadow-sm w-100 galeria-miniatura <?= ($index === 0) ? '' : 'opacity-75' ?>"
+                                         style="height: 120px; object-fit: cover;">
                                 </a>
                             </div>
                         <?php endforeach; ?>
@@ -110,7 +136,9 @@ $foto_principal = $fotos_galeria[0];
 
                 <div class="mb-4 p-4 bg-white rounded-4 shadow-sm border-start border-c2 border-5">
                     <h5 class="fw-bold text-brand mb-3"><span class="me-2"></span>La historia de <?= htmlspecialchars($mascota['nombre']) ?></h5>
-                    <div class="text-dark lh-lg" style="white-space: pre-wrap; font-size: 1.05rem;"><?= htmlspecialchars($mascota['descripcion']) ?></div>
+                    <div class="text-dark lh-lg" style="white-space: pre-wrap; font-size: 1.05rem;">
+                        <?= htmlspecialchars($mascota['descripcion']) ?>
+                    </div>
                 </div>
 
                 <div class="row g-4 mb-4">
@@ -119,39 +147,27 @@ $foto_principal = $fotos_galeria[0];
                             <h5 class="fw-bold text-brand mb-4">Ficha Técnica</h5>
                             <div class="row g-3">
                                 <div class="col-6 d-flex flex-column border-bottom pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
-                                        <i data-lucide="tag" style="width:13px; height:13px;"></i> Raza
-                                    </span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1"><i data-lucide="tag" style="width:13px; height:13px;"></i> Raza</span>
                                     <span class="fw-semibold text-dark"><?= htmlspecialchars($mascota['raza']) ?></span>
                                 </div>
                                 <div class="col-6 d-flex flex-column border-bottom pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
-                                        <i data-lucide="calendar" style="width:13px; height:13px;"></i> Edad
-                                    </span>
-                                    <span class="fw-semibold text-dark"><?= $mascota['edad_valor'] ?> <?= $mascota['edad_unidad'] ?></span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1"><i data-lucide="calendar" style="width:13px; height:13px;"></i> Edad</span>
+                                    <span class="fw-semibold text-dark"><?= (int)$mascota['edad_valor'] ?> <?= htmlspecialchars($mascota['edad_unidad']) ?></span>
                                 </div>
                                 <div class="col-6 d-flex flex-column border-bottom pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
-                                        <i data-lucide="maximize-2" style="width:13px; height:13px;"></i> Tamaño
-                                    </span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1"><i data-lucide="maximize-2" style="width:13px; height:13px;"></i> Tamaño</span>
                                     <span class="fw-semibold text-dark"><?= htmlspecialchars($mascota['tamanio']) ?></span>
                                 </div>
                                 <div class="col-6 d-flex flex-column border-bottom pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
-                                        <i data-lucide="users" style="width:13px; height:13px;"></i> Sexo
-                                    </span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1"><i data-lucide="users" style="width:13px; height:13px;"></i> Sexo</span>
                                     <span class="fw-semibold text-dark"><?= htmlspecialchars($mascota['sexo']) ?></span>
                                 </div>
                                 <div class="col-6 d-flex flex-column pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
-                                        <i data-lucide="home" style="width:13px; height:13px;"></i> Convivencia
-                                    </span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1"><i data-lucide="home" style="width:13px; height:13px;"></i> Convivencia</span>
                                     <span class="fw-semibold text-dark small">Perros y niños</span>
                                 </div>
                                 <div class="col-6 d-flex flex-column pb-2">
-                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1">
-                                        <i data-lucide="tree-pine" style="width:13px; height:13px;"></i> Exterior
-                                    </span>
+                                    <span class="small text-muted fw-bold text-uppercase d-flex align-items-center gap-1"><i data-lucide="tree-pine" style="width:13px; height:13px;"></i> Exterior</span>
                                     <span class="fw-semibold text-dark">Solo interior</span>
                                 </div>
                             </div>
@@ -160,18 +176,33 @@ $foto_principal = $fotos_galeria[0];
                 </div>
 
                 <div class="bg-white p-4 rounded-4 shadow-sm border card-nexadopt mt-4">
-                    <h5 class="fw-bold text-brand mb-2">¿Todo listo para dar el paso?</h5>
-                    <p class="text-muted small mb-4">Si crees que puedes darle a <?= htmlspecialchars($mascota['nombre']) ?> el hogar que se merece, inicia el proceso de adopción.</p>
                     
-                    <?php if(!$puede_adoptar): ?>
+                    <?php if (!$puede_adoptar): ?>
+                        <h5 class="fw-bold text-brand mb-2">Proceso finalizado</h5>
+                        <p class="text-muted small mb-4">Este animal ya ha encontrado su hogar definitivo.</p>
                         <button class="btn btn-secondary btn-lg w-100 fw-bold shadow-sm" disabled>
-                            Este animal ya ha sido adoptado
+                            Adoptado
                         </button>
-                    <?php elseif(isset($_SESSION['id_usuario'])): ?>
-                        <a href="formulario-solicitud.php?id_mascota=<?= $mascota['id_mascota'] ?>" class="btn btn-nexadopt btn-lg w-100 fw-bold shadow-sm py-3 d-inline-flex align-items-center justify-content-center gap-2">
+                    
+                    <?php elseif ($ya_solicitado): ?>
+                        <div class="text-center">
+                            <div class="d-inline-flex align-items-center justify-content-center bg-light text-brand rounded-circle mb-3" style="width: 60px; height: 60px;">
+                                <i data-lucide="check-circle" style="width: 30px; height: 30px;"></i>
+                            </div>
+                            <h5 class="fw-bold text-brand mb-2">Solicitud en curso</h5>
+                            <p class="text-muted small mb-0">Ya has enviado los trámites para adoptar a <?= htmlspecialchars($mascota['nombre']) ?>. Puedes consultar el estado en tu perfil.</p>
+                        </div>
+
+                    <?php elseif (isset($_SESSION['id_usuario'])): ?>
+                        <h5 class="fw-bold text-brand mb-2">¿Todo listo para dar el paso?</h5>
+                        <p class="text-muted small mb-4">Si crees que puedes darle a <?= htmlspecialchars($mascota['nombre']) ?> el hogar que se merece, inicia el proceso de adopción.</p>
+                        <a href="formulario-solicitud.php?id_mascota=<?= $id_mascota ?>" 
+                           class="btn btn-nexadopt btn-lg w-100 fw-bold shadow-sm py-3 d-inline-flex align-items-center justify-content-center gap-2">
                             <i data-lucide="heart" style="width:18px; height:18px;"></i> Empieza tu solicitud
                         </a>
                     <?php else: ?>
+                        <h5 class="fw-bold text-brand mb-2">¿Todo listo para dar el paso?</h5>
+                        <p class="text-muted small mb-4">Si crees que puedes darle a <?= htmlspecialchars($mascota['nombre']) ?> el hogar que se merece, inicia el proceso de adopción.</p>
                         <div class="text-center bg-light p-3 rounded-3 border">
                             <p class="small text-muted mb-2 fw-semibold">Debes iniciar sesión con tu cuenta para poder adoptar.</p>
                             <a href="login.php" class="btn btn-outline-nexadopt w-100 fw-bold">
@@ -179,8 +210,8 @@ $foto_principal = $fotos_galeria[0];
                             </a>
                         </div>
                     <?php endif; ?>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>

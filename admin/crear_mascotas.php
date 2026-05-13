@@ -1,83 +1,94 @@
 <?php
+/**
+ * Alta de nuevas mascotas en el sistema, incluyendo la creación de su carpeta
+ * de imágenes y la subida de hasta 10 fotografías.
+ */
+
 session_start();
-if(!isset($_SESSION['rol']) || $_SESSION['rol'] != 1) {
-    header("Location: ../index.php");
+
+if (!isset($_SESSION['rol']) || (int)$_SESSION['rol'] !== 1) {
+    header('Location: ../index.php');
     exit();
 }
+
 require_once '../config/conexion.php';
 
 $mensaje = '';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Recogemos datos del formulario
-    $nombre      = $_POST['nombre'];
-    $especie     = $_POST['especie'];
-    $raza        = $_POST['raza'];
-    $edad_valor  = $_POST['edad_valor'];
-    $edad_unidad = $_POST['edad_unidad'];
-    $sexo        = $_POST['sexo'];
-    $tamanio     = $_POST['tamanio'];
-    $descripcion = $_POST['descripcion'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    
-    
-    // Limpiamos el nombre de la mascota para usarlo en la carpeta (quitamos espacios y caracteres raros)
-    $nombre_limpio = preg_replace('/[^a-zA-Z0-9]/', '', $nombre);
-    
-    // Creamos el nombre de la carpeta: Nombre + Tiempo (para evitar duplicados si hay dos perros llamados igual)
-    $nombre_carpeta = $nombre_limpio . "_" . time();
-    $ruta_carpeta_destino = "../assets/img/mascotas/" . $nombre_carpeta . "/";
+    // Recogemos y limpiamos los campos del formulario.
+    $nombre      = trim($_POST['nombre']      ?? '');
+    $especie     = trim($_POST['especie']     ?? '');
+    $raza        = trim($_POST['raza']        ?? '');
+    $edad_valor  = (int)($_POST['edad_valor'] ?? 0);
+    $edad_unidad = trim($_POST['edad_unidad'] ?? '');
+    $sexo        = trim($_POST['sexo']        ?? '');
+    $tamanio     = trim($_POST['tamanio']     ?? '');
+    $descripcion = trim($_POST['descripcion'] ?? '');
 
-    // Creamos la carpeta físicamente en el servidor si no existe
+    // Limpiamos el nombre para usarlo como nombre de carpeta seguro en el servidor.
+    // Solo dejamos letras y números para evitar problemas con el sistema de archivos.
+    $nombre_limpio   = preg_replace('/[^a-zA-Z0-9]/', '', $nombre);
+    $nombre_carpeta  = $nombre_limpio . '_' . time();
+    $ruta_carpeta_destino = '../assets/img/mascotas/' . $nombre_carpeta . '/';
+
+    // Creamos la carpeta de la mascota si no existe.
     if (!file_exists($ruta_carpeta_destino)) {
         mkdir($ruta_carpeta_destino, 0777, true);
     }
 
-    $foto_principal = "";
+    $foto_principal      = '';
     $fotos_subidas_count = 0;
-    
-    // Contamos cuántas fotos ha subido el usuario
-    $total_fotos = count($_FILES['fotos']['name']);
-    
-    // Limitamos a un máximo de 10 fotos
-    if ($total_fotos > 10) {
-        $total_fotos = 10;
-    }
 
-    // Recorremos todas las fotos subidas
+    // Limitamos a 10 fotos máximo para no saturar el servidor.
+    $total_fotos = min(count($_FILES['fotos']['name']), 10);
+
     for ($i = 0; $i < $total_fotos; $i++) {
-        $foto_nombre = $_FILES['fotos']['name'][$i];
         $ruta_temporal = $_FILES['fotos']['tmp_name'][$i];
 
-        if ($ruta_temporal != "") {
-            // Generamos un nombre seguro para cada foto (ej: foto_1_171098.jpg)
-            $extension = pathinfo($foto_nombre, PATHINFO_EXTENSION);
-            $nuevo_nombre_foto = "foto_" . ($i + 1) . "_" . time() . "." . $extension;
-            $ruta_final_foto = $ruta_carpeta_destino . $nuevo_nombre_foto;
+        if (!empty($ruta_temporal)) {
+            $extension        = pathinfo($_FILES['fotos']['name'][$i], PATHINFO_EXTENSION);
+            $nuevo_nombre_foto = 'foto_' . ($i + 1) . '_' . time() . '.' . strtolower($extension);
+            $ruta_final_foto  = $ruta_carpeta_destino . $nuevo_nombre_foto;
 
-            // Movemos la foto a su nueva carpeta
             if (move_uploaded_file($ruta_temporal, $ruta_final_foto)) {
-                // Si es la PRIMERA foto (índice 0), la guardamos como foto principal para la Base de Datos
-                if ($i == 0) {
-                    $foto_principal = $nombre_carpeta . "/" . $nuevo_nombre_foto;
+                // La primera foto que se suba exitosamente será la portada de la tarjeta en el catálogo.
+                if ($i === 0) {
+                    $foto_principal = $nombre_carpeta . '/' . $nuevo_nombre_foto;
                 }
                 $fotos_subidas_count++;
             }
         }
     }
 
-    // Si al menos se ha subido 1 foto con éxito, insertamos en BD
+    // Solo insertamos en BD si al menos una foto se subió correctamente.
     if ($fotos_subidas_count > 0) {
-        $sql = "INSERT INTO Mascotas (id_usuario_alta, nombre, especie, raza, edad_valor, edad_unidad, sexo, tamanio, descripcion, foto_url, estado) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Disponible')";
-        
-        $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("isssisssss", $_SESSION['id_usuario'], $nombre, $especie, $raza, $edad_valor, $edad_unidad, $sexo, $tamanio, $descripcion, $foto_principal);
+        try {
+            $sql  = "INSERT INTO Mascotas 
+                         (id_usuario_alta, nombre, especie, raza, edad_valor, edad_unidad, sexo, tamanio, descripcion, foto_url, estado) 
+                     VALUES 
+                         (:id_usuario, :nombre, :especie, :raza, :edad_valor, :edad_unidad, :sexo, :tamanio, :descripcion, :foto_url, 'Disponible')";
 
-        if ($stmt->execute()) {
-            $mensaje = '<div class="alert alert-success">¡Mascota añadida correctamente con ' . $fotos_subidas_count . ' fotos!</div>';
-        } else {
-            $mensaje = '<div class="alert alert-danger">Error al guardar en BD: ' . $conexion->error . '</div>';
+            $stmt = $conexion->prepare($sql);
+            $stmt->execute([
+                ':id_usuario'  => (int)$_SESSION['id_usuario'],
+                ':nombre'      => $nombre,
+                ':especie'     => $especie,
+                ':raza'        => $raza,
+                ':edad_valor'  => $edad_valor,
+                ':edad_unidad' => $edad_unidad,
+                ':sexo'        => $sexo,
+                ':tamanio'     => $tamanio,
+                ':descripcion' => $descripcion,
+                ':foto_url'    => $foto_principal,
+            ]);
+
+            $mensaje = '<div class="alert alert-success">¡Mascota añadida correctamente con ' . $fotos_subidas_count . ' foto(s)!</div>';
+
+        } catch (PDOException $e) {
+            error_log('[NexAdopt - CrearMascota Error] ' . $e->getMessage());
+            $mensaje = '<div class="alert alert-danger">Error al guardar en la base de datos. Por favor, inténtalo de nuevo.</div>';
         }
     } else {
         $mensaje = '<div class="alert alert-danger">Error: Debes subir al menos 1 foto válida.</div>';
@@ -94,6 +105,7 @@ include '../includes/header_admin.php';
                 <h2 class="fw-bold text-brand mb-4 d-flex align-items-center gap-2">
                     <i data-lucide="paw-print" style="width:28px; height:28px;"></i> Añadir Nueva Mascota
                 </h2>
+
                 <?= $mensaje ?>
 
                 <form action="crear_mascotas.php" method="POST" enctype="multipart/form-data">
@@ -134,7 +146,7 @@ include '../includes/header_admin.php';
                             <label class="form-label fw-bold d-flex align-items-center gap-1">
                                 <i data-lucide="calendar" style="width:14px; height:14px;"></i> Edad (Valor)
                             </label>
-                            <input type="number" name="edad_valor" class="form-control" required>
+                            <input type="number" name="edad_valor" class="form-control" min="0" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold d-flex align-items-center gap-1">

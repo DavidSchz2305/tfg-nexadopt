@@ -1,36 +1,61 @@
 <?php
+/**
+ * Inventario completo de mascotas del sistema con acciones de editar y borrar.
+ * 
+ * He migrado el DELETE a una sentencia preparada y el SELECT del listado
+ * a fetchAll() de PDO. También he agregado un conteo de solicitudes directamente en la consulta
+ */
+
 session_start();
-if(!isset($_SESSION['rol']) || $_SESSION['rol'] != 1) {
-    header("Location: ../index.php");
+
+if (!isset($_SESSION['rol']) || (int)$_SESSION['rol'] !== 1) {
+    header('Location: ../index.php');
     exit();
 }
+
 require_once '../config/conexion.php';
 
-// --- Codigo para borrar una mascota ---
+// =========================================================================
+// BORRADO DE UNA MASCOTA
+// =========================================================================
 if (isset($_GET['eliminar'])) {
-    $id_a_borrar = $_GET['eliminar'];
-    $sql_borrar = "DELETE FROM Mascotas WHERE id_mascota = ?";
-    $stmt = $conexion->prepare($sql_borrar);
-    $stmt->bind_param("i", $id_a_borrar);
-    
-    if ($stmt->execute()) {
-        header("Location: lista_mascotas.php?msj=borrado");
-        exit();
+    $id_a_borrar = (int)$_GET['eliminar'];
+
+    if ($id_a_borrar > 0) {
+        try {
+            $stmt_borrar = $conexion->prepare("DELETE FROM Mascotas WHERE id_mascota = :id");
+            $stmt_borrar->execute([':id' => $id_a_borrar]);
+
+            header('Location: lista_mascotas.php?msj=borrado');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log('[NexAdopt - ListaMascotas/Delete Error] ' . $e->getMessage());
+        }
     }
 }
 
-// --- CONSULTA ---
-$sql = "SELECT m.id_mascota, m.nombre, m.especie, m.raza, m.estado, m.foto_url, m.descripcion,
-               COUNT(s.id_solicitud) AS total_solicitudes
-        FROM Mascotas m
-        LEFT JOIN Solicitudes_Adopcion s ON m.id_mascota = s.id_mascota
-        GROUP BY m.id_mascota
-        ORDER BY m.id_mascota DESC";
+// =========================================================================
+// CARGA DEL INVENTARIO COMPLETO
+// =========================================================================
+// Usamos un LEFT JOIN con COUNT para saber cuántas solicitudes tiene cada mascota
+// directamente en la consulta, evitando consultas adicionales dentro del bucle.
+$mascotas = [];
+try {
+    $mascotas = $conexion->query(
+        "SELECT 
+             m.id_mascota, m.nombre, m.especie, m.raza, m.estado, m.foto_url, m.descripcion,
+             COUNT(s.id_solicitud) AS total_solicitudes
+         FROM Mascotas m
+         LEFT JOIN Solicitudes_Adopcion s ON m.id_mascota = s.id_mascota
+         GROUP BY m.id_mascota
+         ORDER BY m.id_mascota DESC"
+    )->fetchAll();
+} catch (PDOException $e) {
+    error_log('[NexAdopt - ListaMascotas/List Error] ' . $e->getMessage());
+}
 
-$resultado = $conexion->query($sql);
-
-
-include '../includes/header_admin.php'; 
+include '../includes/header_admin.php';
 ?>
 
 <div class="container-fluid py-4">
@@ -43,7 +68,7 @@ include '../includes/header_admin.php';
         </a>
     </div>
 
-    <?php if(isset($_GET['msj']) && $_GET['msj'] == 'borrado'): ?>
+    <?php if (isset($_GET['msj']) && $_GET['msj'] === 'borrado'): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             Mascota eliminada correctamente.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -65,55 +90,64 @@ include '../includes/header_admin.php';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if($resultado && $resultado->num_rows > 0): ?>
-                        <?php while($row = $resultado->fetch_assoc()): ?>
+                    <?php if (!empty($mascotas)): ?>
+                        <?php foreach ($mascotas as $row):
+                            // Determinamos el color del badge de estado con match() de PHP 8.
+                            $badge_clase = match ($row['estado']) {
+                                'En proceso' => 'bg-warning text-dark',
+                                'Adoptado'   => 'bg-secondary',
+                                default      => 'bg-success',
+                            };
+                        ?>
                             <tr>
                                 <td class="ps-4">
-                                    <img src="../assets/img/mascotas/<?php echo $row['foto_url']; ?>" 
-                                         alt="" class="rounded-3 shadow-sm" 
-                                         style="width: 70px; height: 70px; object-fit: cover;">
+                                    <img src="../assets/img/mascotas/<?= htmlspecialchars($row['foto_url']) ?>"
+                                         alt="<?= htmlspecialchars($row['nombre']) ?>"
+                                         class="rounded-3 shadow-sm"
+                                         style="width: 70px; height: 70px; object-fit: cover;"
+                                         onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=100&auto=format&fit=crop'">
                                 </td>
                                 <td>
-                                    <div class="fw-bold text-brand"><?php echo $row['nombre']; ?></div>
-                                    <div class="text-muted small">ID: #<?php echo $row['id_mascota']; ?></div>
+                                    <div class="fw-bold text-brand"><?= htmlspecialchars($row['nombre']) ?></div>
+                                    <div class="text-muted small">ID: #<?= (int)$row['id_mascota'] ?></div>
                                 </td>
                                 <td>
-                                    <div><?php echo $row['especie']; ?></div>
-                                    <div class="text-muted small"><?php echo $row['raza']; ?></div>
+                                    <div><?= htmlspecialchars($row['especie']) ?></div>
+                                    <div class="text-muted small"><?= htmlspecialchars($row['raza']) ?></div>
                                 </td>
                                 <td>
-                                    <?php 
-                                        $clase = 'bg-success';
-                                        if($row['estado'] == 'En proceso') $clase = 'bg-warning text-dark';
-                                        if($row['estado'] == 'Adoptado') $clase = 'bg-secondary';
-                                    ?>
-                                    <span class="badge <?php echo $clase; ?> opacity-75">
-                                        <?php echo $row['estado']; ?>
+                                    <span class="badge <?= $badge_clase ?> opacity-75">
+                                        <?= htmlspecialchars($row['estado']) ?>
                                     </span>
                                 </td>
                                 <td class="small text-muted" style="max-width: 200px;">
-                                    <?php echo (strlen($row['descripcion']) > 45) ? substr($row['descripcion'], 0, 45) . '...' : $row['descripcion']; ?>
+                                    <?= (mb_strlen($row['descripcion']) > 45)
+                                        ? htmlspecialchars(mb_substr($row['descripcion'], 0, 45)) . '...'
+                                        : htmlspecialchars($row['descripcion']) ?>
                                 </td>
                                 <td>
                                     <span class="badge bg-light text-dark border rounded-pill px-3 d-inline-flex align-items-center gap-1">
-                                        <?php echo $row['total_solicitudes']; ?>
+                                        <?= (int)$row['total_solicitudes'] ?>
                                         <i data-lucide="mail" style="width:13px; height:13px;"></i>
                                     </span>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <a href="editar_mascota.php?id=<?php echo $row['id_mascota']; ?>" class="btn btn-sm btn-outline-primary border-0 me-2 d-inline-flex align-items-center gap-1">
+                                    <a href="editar_mascota.php?id=<?= (int)$row['id_mascota'] ?>"
+                                       class="btn btn-sm btn-outline-primary border-0 me-2 d-inline-flex align-items-center gap-1">
                                         <i data-lucide="pencil" style="width:14px; height:14px;"></i> Editar
                                     </a>
-                                    <a href="lista_mascotas.php?eliminar=<?php echo $row['id_mascota']; ?>" 
+                                    <a href="lista_mascotas.php?eliminar=<?= (int)$row['id_mascota'] ?>"
                                        class="btn btn-sm btn-outline-danger border-0 d-inline-flex align-items-center gap-1"
-                                       onclick="return confirm('¿Eliminar a <?php echo $row['nombre']; ?>?')">
+                                       onclick="return confirm('¿Eliminar a <?= htmlspecialchars(addslashes($row['nombre'])) ?>?')">
                                         <i data-lucide="trash-2" style="width:14px; height:14px;"></i> Borrar
                                     </a>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="7" class="text-center py-4">No hay datos.</td></tr>
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No hay mascotas registradas.</td>
+                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -123,6 +157,4 @@ include '../includes/header_admin.php';
 
 <script>lucide.createIcons();</script>
 
-<?php 
-include '../includes/footer_admin.php'; 
-?>
+<?php include '../includes/footer_admin.php'; ?>
