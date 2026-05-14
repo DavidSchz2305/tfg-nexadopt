@@ -1,6 +1,6 @@
 <?php
 /**
- * Edición completa de una mascota: datos, estado y galería de fotos.
+ * Edición completa de una mascota: datos, estado, clínica y galería de fotos.
  * FLUJO: Cargamos datos → procesamos POST si existe → recargamos datos → renderizamos.
  */
 
@@ -25,9 +25,6 @@ $mensaje    = '';
 // =========================================================================
 // FUNCIÓN AUXILIAR: Carga los datos de una mascota por su ID
 // =========================================================================
-// La he extraído a una función para poder reutilizarla al recargar
-// el formulario después de guardar los cambios.
-
 function cargarMascota(PDO $conexion, int $id): ?array
 {
     try {
@@ -70,9 +67,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $estado      = trim($_POST['estado']      ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
 
+    //CAMPOS CLÍNICOS
+    $vacunado       = isset($_POST['vacunado']) ? 1 : 0;
+    $desparasitado  = isset($_POST['desparasitado']) ? 1 : 0;
+    $castrado       = isset($_POST['castrado']) ? 1 : 0;
+    $fecha_revision = !empty($_POST['fecha_revision']) ? $_POST['fecha_revision'] : null;
+
     // --- PASO 1: Eliminar fotos marcadas para borrar ---
-    // Verificamos que cada ruta a borrar exista físicamente antes de llamar a unlink().
-    
     if (!empty($_POST['eliminar_fotos'])) {
         foreach ($_POST['eliminar_fotos'] as $foto_a_borrar) {
             $foto_real = realpath($foto_a_borrar);
@@ -96,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         for ($i = 0; $i < $total_nuevas; $i++) {
             $ruta_temporal = $_FILES['nuevas_fotos']['tmp_name'][$i];
             if (!empty($ruta_temporal)) {
-                $extension        = pathinfo($_FILES['nuevas_fotos']['name'][$i], PATHINFO_EXTENSION);
+                $extension         = pathinfo($_FILES['nuevas_fotos']['name'][$i], PATHINFO_EXTENSION);
                 $nuevo_nombre_foto = 'foto_nueva_' . time() . '_' . $i . '.' . strtolower($extension);
                 move_uploaded_file($ruta_temporal, $ruta_directorio . $nuevo_nombre_foto);
             }
@@ -104,7 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // --- PASO 4: Determinar la nueva foto principal ---
-    // Después de borrar y añadir fotos, escaneamos la carpeta para saber cuál queda primera.
     $foto_principal_nueva = '';
     if (is_dir($ruta_directorio)) {
         $fotos_restantes = glob($ruta_directorio . '*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE);
@@ -115,32 +115,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // --- PASO 5: Actualizar en base de datos ---
     try {
+        // ACTUALIZACIÓN DE SQL CON CAMPOS CLÍNICOS
         $sql_update = "UPDATE Mascotas SET 
-                           nombre      = :nombre,
-                           especie     = :especie,
-                           raza        = :raza,
-                           edad_valor  = :edad_valor,
-                           edad_unidad = :edad_unidad,
-                           sexo        = :sexo,
-                           tamanio     = :tamanio,
-                           estado      = :estado,
-                           descripcion = :descripcion,
-                           foto_url    = :foto_url
+                           nombre        = :nombre,
+                           especie       = :especie,
+                           raza          = :raza,
+                           edad_valor    = :edad_valor,
+                           edad_unidad   = :edad_unidad,
+                           sexo          = :sexo,
+                           tamanio       = :tamanio,
+                           estado        = :estado,
+                           descripcion   = :descripcion,
+                           foto_url      = :foto_url,
+                           vacunado      = :vacunado,
+                           desparasitado = :desparasitado,
+                           castrado      = :castrado,
+                           fecha_revision= :fecha_revision
                        WHERE id_mascota = :id";
 
         $stmt = $conexion->prepare($sql_update);
         $stmt->execute([
-            ':nombre'      => $nombre,
-            ':especie'     => $especie,
-            ':raza'        => $raza,
-            ':edad_valor'  => $edad_valor,
-            ':edad_unidad' => $edad_unidad,
-            ':sexo'        => $sexo,
-            ':tamanio'     => $tamanio,
-            ':estado'      => $estado,
-            ':descripcion' => $descripcion,
-            ':foto_url'    => $foto_principal_nueva,
-            ':id'          => $id_mascota,
+            ':nombre'        => $nombre,
+            ':especie'       => $especie,
+            ':raza'          => $raza,
+            ':edad_valor'    => $edad_valor,
+            ':edad_unidad'   => $edad_unidad,
+            ':sexo'          => $sexo,
+            ':tamanio'       => $tamanio,
+            ':estado'        => $estado,
+            ':descripcion'   => $descripcion,
+            ':foto_url'      => $foto_principal_nueva,
+            ':vacunado'      => $vacunado,
+            ':desparasitado' => $desparasitado,
+            ':castrado'      => $castrado,
+            ':fecha_revision'=> $fecha_revision,
+            ':id'            => $id_mascota,
         ]);
 
         $mensaje = '<div class="alert alert-success">¡Datos y fotos actualizados correctamente!</div>';
@@ -173,7 +182,7 @@ include '../includes/header_admin.php';
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <div class="card border-0 shadow-sm rounded-4 p-5 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-5 bg-white text-start">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="fw-bold text-brand mb-0 d-flex align-items-center gap-2">
                         <i data-lucide="pencil" style="width:24px; height:24px;"></i> Editar Mascota: <?= htmlspecialchars($mascota['nombre']) ?>
@@ -237,7 +246,36 @@ include '../includes/header_admin.php';
                                 <option value="Adoptado"   <?= ($mascota['estado'] === 'Adoptado')   ? 'selected' : '' ?>>🔴 Adoptado</option>
                             </select>
                         </div>
-                        <div class="col-12">
+
+                        <div class="col-12 mt-4">
+                            <h6 class="fw-bold text-brand border-bottom pb-2">Información Clínica</h6>
+                            <div class="row g-3 py-2">
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="vacunado" value="1" id="vax" <?= (!empty($mascota['vacunado'])) ? 'checked' : '' ?>>
+                                        <label class="form-check-label fw-semibold" for="vax">Vacunado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="desparasitado" value="1" id="desp" <?= (!empty($mascota['desparasitado'])) ? 'checked' : '' ?>>
+                                        <label class="form-check-label fw-semibold" for="desp">Desparasitado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="castrado" value="1" id="cast" <?= (!empty($mascota['castrado'])) ? 'checked' : '' ?>>
+                                        <label class="form-check-label fw-semibold" for="cast">Esterilizado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Fecha de última revisión</label>
+                                    <input type="date" name="fecha_revision" class="form-control form-control-sm" value="<?= $mascota['fecha_revision'] ?? '' ?>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-3">
                             <label class="form-label fw-bold">Descripción / Historia</label>
                             <textarea name="descripcion" class="form-control" rows="5"><?= htmlspecialchars($mascota['descripcion']) ?></textarea>
                         </div>

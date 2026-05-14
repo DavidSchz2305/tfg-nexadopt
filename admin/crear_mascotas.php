@@ -27,8 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tamanio     = trim($_POST['tamanio']     ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
 
+    //CAMPOS CLÍNICOS
+    $vacunado       = isset($_POST['vacunado']) ? 1 : 0;
+    $desparasitado  = isset($_POST['desparasitado']) ? 1 : 0;
+    $castrado       = isset($_POST['castrado']) ? 1 : 0;
+    $fecha_revision = !empty($_POST['fecha_revision']) ? $_POST['fecha_revision'] : null;
+
     // Limpiamos el nombre para usarlo como nombre de carpeta seguro en el servidor.
-    // Solo dejamos letras y números para evitar problemas con el sistema de archivos.
     $nombre_limpio   = preg_replace('/[^a-zA-Z0-9]/', '', $nombre);
     $nombre_carpeta  = $nombre_limpio . '_' . time();
     $ruta_carpeta_destino = '../assets/img/mascotas/' . $nombre_carpeta . '/';
@@ -48,12 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ruta_temporal = $_FILES['fotos']['tmp_name'][$i];
 
         if (!empty($ruta_temporal)) {
-            $extension        = pathinfo($_FILES['fotos']['name'][$i], PATHINFO_EXTENSION);
+            $extension         = pathinfo($_FILES['fotos']['name'][$i], PATHINFO_EXTENSION);
             $nuevo_nombre_foto = 'foto_' . ($i + 1) . '_' . time() . '.' . strtolower($extension);
-            $ruta_final_foto  = $ruta_carpeta_destino . $nuevo_nombre_foto;
+            $ruta_final_foto   = $ruta_carpeta_destino . $nuevo_nombre_foto;
 
             if (move_uploaded_file($ruta_temporal, $ruta_final_foto)) {
-                // La primera foto que se suba exitosamente será la portada de la tarjeta en el catálogo.
                 if ($i === 0) {
                     $foto_principal = $nombre_carpeta . '/' . $nuevo_nombre_foto;
                 }
@@ -62,26 +66,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Solo insertamos en BD si al menos una foto se subió correctamente.
     if ($fotos_subidas_count > 0) {
         try {
+            // SQL ACTUALIZADA CON CAMPOS CLÍNICOS
             $sql  = "INSERT INTO Mascotas 
-                         (id_usuario_alta, nombre, especie, raza, edad_valor, edad_unidad, sexo, tamanio, descripcion, foto_url, estado) 
+                         (id_usuario_alta, nombre, especie, raza, edad_valor, edad_unidad, sexo, tamanio, descripcion, foto_url, estado, vacunado, desparasitado, castrado, fecha_revision) 
                      VALUES 
-                         (:id_usuario, :nombre, :especie, :raza, :edad_valor, :edad_unidad, :sexo, :tamanio, :descripcion, :foto_url, 'Disponible')";
+                         (:id_usuario, :nombre, :especie, :raza, :edad_valor, :edad_unidad, :sexo, :tamanio, :descripcion, :foto_url, 'Disponible', :vacunado, :desparasitado, :castrado, :fecha_revision)";
 
             $stmt = $conexion->prepare($sql);
             $stmt->execute([
-                ':id_usuario'  => (int)$_SESSION['id_usuario'],
-                ':nombre'      => $nombre,
-                ':especie'     => $especie,
-                ':raza'        => $raza,
-                ':edad_valor'  => $edad_valor,
-                ':edad_unidad' => $edad_unidad,
-                ':sexo'        => $sexo,
-                ':tamanio'     => $tamanio,
-                ':descripcion' => $descripcion,
-                ':foto_url'    => $foto_principal,
+                ':id_usuario'   => (int)$_SESSION['id_usuario'],
+                ':nombre'       => $nombre,
+                ':especie'      => $especie,
+                ':raza'         => $raza,
+                ':edad_valor'   => $edad_valor,
+                ':edad_unidad'  => $edad_unidad,
+                ':sexo'         => $sexo,
+                ':tamanio'      => $tamanio,
+                ':descripcion'  => $descripcion,
+                ':foto_url'     => $foto_principal,
+                ':vacunado'     => $vacunado,
+                ':desparasitado' => $desparasitado,
+                ':castrado'     => $castrado,
+                ':fecha_revision' => $fecha_revision
             ]);
 
             $mensaje = '<div class="alert alert-success">¡Mascota añadida correctamente con ' . $fotos_subidas_count . ' foto(s)!</div>';
@@ -101,7 +109,7 @@ include '../includes/header_admin.php';
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <div class="card border-0 shadow-sm rounded-4 p-5 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 p-5 bg-white text-start">
                 <h2 class="fw-bold text-brand mb-4 d-flex align-items-center gap-2">
                     <i data-lucide="paw-print" style="width:28px; height:28px;"></i> Añadir Nueva Mascota
                 </h2>
@@ -168,7 +176,35 @@ include '../includes/header_admin.php';
                             </select>
                         </div>
 
-                        <div class="col-12">
+                        <div class="col-12 mt-4">
+                            <h5 class="fw-bold text-brand border-bottom pb-2">Información Clínica</h5>
+                            <div class="row g-3 py-2">
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="vacunado" value="1" id="vax">
+                                        <label class="form-check-label fw-semibold" for="vax">Vacunado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="desparasitado" value="1" id="desp">
+                                        <label class="form-check-label fw-semibold" for="desp">Desparasitado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="castrado" value="1" id="cast">
+                                        <label class="form-check-label fw-semibold" for="cast">Esterilizado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Fecha de última revisión</label>
+                                    <input type="date" name="fecha_revision" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4">
                             <label class="form-label fw-bold d-flex align-items-center gap-1">
                                 <i data-lucide="file-text" style="width:14px; height:14px;"></i> Descripción / Historia
                             </label>
@@ -180,7 +216,7 @@ include '../includes/header_admin.php';
                                 <i data-lucide="image" style="width:14px; height:14px;"></i> Fotos de la mascota (Hasta 10 imágenes)
                             </label>
                             <input type="file" name="fotos[]" class="form-control" accept="image/*" multiple required>
-                            <small class="text-muted">Mantén pulsada la tecla CTRL para seleccionar varias fotos a la vez en tu ordenador.</small>
+                            <small class="text-muted">La primera foto seleccionada será la imagen principal.</small>
                         </div>
 
                         <div class="col-12 mt-4 text-end">

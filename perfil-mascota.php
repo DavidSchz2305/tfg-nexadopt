@@ -173,7 +173,46 @@ $foto_principal = $fotos_galeria[0];
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="col-12">
+                        <div class="bg-white p-4 rounded-4 shadow-sm border border-info-subtle h-100">
+                            <h5 class="fw-bold text-brand mb-4 d-flex align-items-center gap-2">
+                                <i data-lucide="stethoscope" class="text-info" style="width: 20px; height: 20px;"></i> Historial Clínico
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i data-lucide="<?= !empty($mascota['vacunado']) ? 'check-circle' : 'x-circle' ?>" class="<?= !empty($mascota['vacunado']) ? 'text-success' : 'text-danger' ?>" style="width: 18px; height: 18px;"></i>
+                                        <span class="fw-semibold">Vacunación:</span> 
+                                        <span class="text-muted"><?= !empty($mascota['vacunado']) ? 'Al día' : 'Pendiente' ?></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i data-lucide="<?= !empty($mascota['desparasitado']) ? 'check-circle' : 'x-circle' ?>" class="<?= !empty($mascota['desparasitado']) ? 'text-success' : 'text-danger' ?>" style="width: 18px; height: 18px;"></i>
+                                        <span class="fw-semibold">Desparasitado:</span> 
+                                        <span class="text-muted"><?= !empty($mascota['desparasitado']) ? 'Sí' : 'No' ?></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i data-lucide="<?= !empty($mascota['castrado']) ? 'check-circle' : 'x-circle' ?>" class="<?= !empty($mascota['castrado']) ? 'text-success' : 'text-danger' ?>" style="width: 18px; height: 18px;"></i>
+                                        <span class="fw-semibold">Esterilizado:</span> 
+                                        <span class="text-muted"><?= !empty($mascota['castrado']) ? 'Sí' : 'No' ?></span>
+                                    </div>
+                                </div>
+                                <?php if(!empty($mascota['fecha_revision'])): ?>
+                                <div class="col-12 mt-3 pt-3 border-top">
+                                    <p class="small text-muted mb-0 d-flex align-items-center gap-1">
+                                        <i data-lucide="calendar-check" style="width:14px; height:14px;"></i> 
+                                        Última revisión veterinaria: <strong><?= date('d/m/Y', strtotime($mascota['fecha_revision'])) ?></strong>
+                                    </p>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
 
                 <div class="bg-white p-4 rounded-4 shadow-sm border card-nexadopt mt-4">
                     
