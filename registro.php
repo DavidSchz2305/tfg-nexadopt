@@ -1,12 +1,18 @@
 <?php
 /**
  * Registro de nuevos usuarios en la plataforma.
- * He implementado una doble verificación: primero comprobamos que el email no exista
- * y luego insertamos el nuevo registro con la contraseña hasheada con bcrypt.
+ *
+ * Medidas de seguridad implementadas:
+ *  - Token CSRF (includes/csrf.php) para proteger el formulario.
+ *  - Verificación de unicidad del email antes del INSERT.
+ *  - password_hash() con algoritmo BCRYPT (PASSWORD_DEFAULT) para almacenar credenciales.
+ *  - Validación mínima de longitud de contraseña (8 caracteres).
+ *  - Rol 2 asignado por defecto (usuario estándar); los admin solo se crean desde el panel.
  */
 
 session_start();
 require_once 'config/conexion.php';
+require_once 'includes/csrf.php';
 
 // Si ya está logueado, no tiene sentido que vea esta página.
 if (isset($_SESSION['id_usuario'])) {
@@ -18,58 +24,61 @@ $mensaje = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Recogemos y limpiamos todos los campos del formulario.
-    $nombre       = trim($_POST['nombre']       ?? '');
-    $apellidos    = trim($_POST['apellidos']    ?? '');
-    $email        = trim($_POST['email']        ?? '');
-    $telefono     = trim($_POST['telefono']     ?? '');
-    $password     = $_POST['password']     ?? '';
-    $password_conf = $_POST['password_conf'] ?? '';
-
-    // Validación básica de campos obligatorios antes de tocar la base de datos.
-    if (empty($nombre) || empty($apellidos) || empty($email) || empty($password)) {
-        $mensaje = '<div class="alert alert-danger">Por favor, rellena todos los campos obligatorios.</div>';
-    } elseif ($password !== $password_conf) {
-        $mensaje = '<div class="alert alert-danger">Las contraseñas no coinciden.</div>';
-    } elseif (strlen($password) < 8) {
-        // Añado una validación mínima de longitud de contraseña para reforzar la seguridad.
-        $mensaje = '<div class="alert alert-danger">La contraseña debe tener al menos 8 caracteres.</div>';
+    // 1. Validación del token CSRF antes de procesar cualquier campo del formulario.
+    if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
+        $mensaje = '<div class="alert alert-danger">Error de seguridad. Por favor, recarga la página e inténtalo de nuevo.</div>';
     } else {
 
-        try {
-            // Paso 1: Comprobamos si el email ya existe en la BD para evitar duplicados.
-            $stmt_check = $conexion->prepare("SELECT id_usuario FROM Usuarios WHERE email = :email LIMIT 1");
-            $stmt_check->execute([':email' => $email]);
+        $nombre        = trim($_POST['nombre']        ?? '');
+        $apellidos     = trim($_POST['apellidos']     ?? '');
+        $email         = trim($_POST['email']         ?? '');
+        $telefono      = trim($_POST['telefono']      ?? '');
+        $password      = $_POST['password']           ?? '';
+        $password_conf = $_POST['password_conf']      ?? '';
 
-            if ($stmt_check->fetch()) {
-                $mensaje = '<div class="alert alert-warning">Ese correo ya está registrado. <a href="login.php" class="alert-link">Inicia sesión aquí</a>.</div>';
-            } else {
-                // Paso 2: Hasheamos la contraseña con el algoritmo bcrypt (PASSWORD_DEFAULT).
-                // Este método es el estándar actual y es resistente a ataques de fuerza bruta.
-                $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+        if (empty($nombre) || empty($apellidos) || empty($email) || empty($password)) {
+            $mensaje = '<div class="alert alert-danger">Por favor, rellena todos los campos obligatorios.</div>';
+        } elseif ($password !== $password_conf) {
+            $mensaje = '<div class="alert alert-danger">Las contraseñas no coinciden.</div>';
+        } elseif (strlen($password) < 8) {
+            $mensaje = '<div class="alert alert-danger">La contraseña debe tener al menos 8 caracteres.</div>';
+        } else {
+            try {
+                // 2. Comprobamos si el email ya existe para evitar duplicados.
+                $stmt_check = $conexion->prepare("SELECT id_usuario FROM Usuarios WHERE email = :email LIMIT 1");
+                $stmt_check->execute([':email' => $email]);
 
-                // Paso 3: Insertamos el nuevo usuario. El rol 2 corresponde a "Usuario" estándar.
-                // Los administradores solo pueden crearse directamente desde el panel, nunca desde aquí.
-                $sql_insert = "INSERT INTO Usuarios (id_rol, nombre, apellidos, email, password, telefono) 
-                               VALUES (2, :nombre, :apellidos, :email, :password, :telefono)";
-                $stmt_insert = $conexion->prepare($sql_insert);
-                $stmt_insert->execute([
-                    ':nombre'    => $nombre,
-                    ':apellidos' => $apellidos,
-                    ':email'     => $email,
-                    ':password'  => $password_hashed,
-                    ':telefono'  => $telefono ?: null, // Si el teléfono viene vacío, guardamos NULL
-                ]);
+                if ($stmt_check->fetch()) {
+                    $mensaje = '<div class="alert alert-warning">Ese correo ya está registrado. <a href="login.php" class="alert-link">Inicia sesión aquí</a>.</div>';
+                } else {
+                    // 3. Hasheamos la contraseña con BCRYPT antes de guardarla.
+                    $password_hashed = password_hash($password, PASSWORD_DEFAULT);
 
-                $mensaje = '<div class="alert alert-success">¡Registro completado con éxito! <a href="login.php" class="alert-link">Ya puedes iniciar sesión</a>.</div>';
+                    // 4. Insertamos el nuevo usuario con rol 2 (usuario estándar).
+                    $sql_insert = "INSERT INTO Usuarios (id_rol, nombre, apellidos, email, password, telefono)
+                                   VALUES (2, :nombre, :apellidos, :email, :password, :telefono)";
+                    $stmt_insert = $conexion->prepare($sql_insert);
+                    $stmt_insert->execute([
+                        ':nombre'    => $nombre,
+                        ':apellidos' => $apellidos,
+                        ':email'     => $email,
+                        ':password'  => $password_hashed,
+                        ':telefono'  => $telefono ?: null,
+                    ]);
+
+                    $mensaje = '<div class="alert alert-success">¡Registro completado con éxito! <a href="login.php" class="alert-link">Ya puedes iniciar sesión</a>.</div>';
+                }
+
+            } catch (PDOException $e) {
+                error_log('[NexAdopt - Registro Error] ' . $e->getMessage());
+                $mensaje = '<div class="alert alert-danger">Hubo un error técnico al registrar tu cuenta. Por favor, inténtalo de nuevo.</div>';
             }
-
-        } catch (PDOException $e) {
-            error_log('[NexAdopt - Registro Error] ' . $e->getMessage());
-            $mensaje = '<div class="alert alert-danger">Hubo un error técnico al registrar tu cuenta. Por favor, inténtalo de nuevo.</div>';
         }
     }
 }
+
+// Generamos el token CSRF y lo pasamos a la vista.
+$csrf_token = generateCsrfToken();
 
 include 'includes/header.php';
 ?>
@@ -88,6 +97,9 @@ include 'includes/header.php';
                         <?= $mensaje ?>
 
                         <form action="registro.php" method="POST">
+
+                            <!-- Token CSRF: protege el formulario contra ataques Cross-Site Request Forgery -->
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">

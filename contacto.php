@@ -1,65 +1,77 @@
 <?php
 /**
  * Formulario de contacto que almacena los mensajes en la tabla `mensajes_contacto`.
- * He usado una sentencia preparada con parámetros nombrados para la inserción,
- * lo que elimina cualquier riesgo de inyección SQL independientemente del contenido
- * que el usuario escriba en el campo de mensaje.
+ *
+ * Medidas de seguridad implementadas:
+ *  - Token CSRF (includes/csrf.php) para proteger el formulario.
+ *  - Sentencia preparada PDO con parámetros nombrados para la inserción,
+ *    eliminando cualquier riesgo de inyección SQL.
+ *  - Validación de formato de email con FILTER_VALIDATE_EMAIL.
  */
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once 'config/conexion.php';
-include 'includes/header.php';
+require_once 'includes/csrf.php';
 
 $mensaje_enviado = false;
 $error_mensaje   = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Recogemos y limpiamos los datos del formulario.
-    $nombre             = trim($_POST['nombre']    ?? '');
-    $telefono           = trim($_POST['telefono']  ?? '');
-    $email              = trim($_POST['email']     ?? '');
-    $asunto             = trim($_POST['asunto']    ?? '');
-    $mensaje            = trim($_POST['mensaje']   ?? '');
-    $terminos_aceptados = isset($_POST['terminos']);
-
-    // Validamos antes de ejecutar cualquier operación en la BD.
-    if (empty($nombre) || empty($email) || empty($asunto) || empty($mensaje)) {
-        $error_mensaje = 'Por favor, rellena todos los campos obligatorios.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        // Añado una validación extra de formato de email que no existía en la versión original.
-        $error_mensaje = 'El formato del correo electrónico no es válido.';
-    } elseif (!$terminos_aceptados) {
-        $error_mensaje = 'Debes aceptar la Política de Privacidad para poder enviar el mensaje.';
+    // 1. Validación del token CSRF antes de procesar cualquier campo del formulario.
+    if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
+        $error_mensaje = 'Error de seguridad. Por favor, recarga la página e inténtalo de nuevo.';
     } else {
-        try {
-            $sql = "INSERT INTO mensajes_contacto (nombre, telefono, email, asunto, mensaje) 
-                    VALUES (:nombre, :telefono, :email, :asunto, :mensaje)";
-            
-            $stmt = $conexion->prepare($sql);
-            $stmt->execute([
-                ':nombre'   => $nombre,
-                ':telefono' => $telefono ?: null,
-                ':email'    => $email,
-                ':asunto'   => $asunto,
-                ':mensaje'  => $mensaje,
-            ]);
 
-            $mensaje_enviado = true;
+        $nombre             = trim($_POST['nombre']    ?? '');
+        $telefono           = trim($_POST['telefono']  ?? '');
+        $email              = trim($_POST['email']     ?? '');
+        $asunto             = trim($_POST['asunto']    ?? '');
+        $mensaje            = trim($_POST['mensaje']   ?? '');
+        $terminos_aceptados = isset($_POST['terminos']);
 
-        } catch (PDOException $e) {
-            error_log('[NexAdopt - Contacto Error] ' . $e->getMessage());
-            $error_mensaje = 'Lo sentimos, hubo un error técnico al guardar tu mensaje. Por favor, inténtalo de nuevo.';
+        if (empty($nombre) || empty($email) || empty($asunto) || empty($mensaje)) {
+            $error_mensaje = 'Por favor, rellena todos los campos obligatorios.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error_mensaje = 'El formato del correo electrónico no es válido.';
+        } elseif (!$terminos_aceptados) {
+            $error_mensaje = 'Debes aceptar la Política de Privacidad para poder enviar el mensaje.';
+        } else {
+            try {
+                // 2. Inserción con sentencia preparada y parámetros nombrados.
+                $sql = "INSERT INTO mensajes_contacto (nombre, telefono, email, asunto, mensaje)
+                        VALUES (:nombre, :telefono, :email, :asunto, :mensaje)";
+
+                $stmt = $conexion->prepare($sql);
+                $stmt->execute([
+                    ':nombre'   => $nombre,
+                    ':telefono' => $telefono ?: null,
+                    ':email'    => $email,
+                    ':asunto'   => $asunto,
+                    ':mensaje'  => $mensaje,
+                ]);
+
+                $mensaje_enviado = true;
+
+            } catch (PDOException $e) {
+                error_log('[NexAdopt - Contacto Error] ' . $e->getMessage());
+                $error_mensaje = 'Lo sentimos, hubo un error técnico al guardar tu mensaje. Por favor, inténtalo de nuevo.';
+            }
         }
     }
 }
+
+// Generamos el token CSRF y lo pasamos a la vista.
+$csrf_token = generateCsrfToken();
+
+include 'includes/header.php';
 ?>
 
 <main class="site-main py-5" style="background-color: var(--c1);">
     <div class="container py-4">
-        
+
         <div class="row justify-content-center mb-5 text-center">
             <div class="col-lg-8">
                 <span class="badge px-3 py-2 rounded-pill mb-3 fw-bold" style="background-color: var(--c2); color: var(--c4);">
@@ -93,11 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <div class="row justify-content-center g-4">
-            
+
             <div class="col-lg-4">
                 <div class="contacto-info-box p-4 rounded-4 shadow-sm h-100 bg-white">
                     <h4 class="fw-bold mb-4 border-bottom pb-2" style="color: var(--c4);">Información de contacto</h4>
-                    
+
                     <div class="d-flex align-items-start mb-4">
                         <div class="contacto-icon rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm">
                             <i class="fas fa-map-marker-alt fs-5"></i>
@@ -129,9 +141,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="rounded-3 overflow-hidden mt-4 shadow-sm border" style="height: 250px;">
-                        <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12128.530653655474!2d-3.6334651030064245!3d40.53866299863481!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422e1cae3d5fcb%3A0xbc70fdebb6d34e6e!2sParque%20Comercial%20R%C3%ADo%20Norte!5e0!3m2!1ses!2ses!4v1712760000000!5m2!1ses!2ses" 
-                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" 
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12128.530653655474!2d-3.6334651030064245!3d40.53866299863481!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422e1cae3d5fcb%3A0xbc70fdebb6d34e6e!2sParque%20Comercial%20R%C3%ADo%20Norte!5e0!3m2!1ses!2ses!4v1712760000000!5m2!1ses!2ses"
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade">
                         </iframe>
                     </div>
@@ -142,8 +154,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="p-4 p-md-5 rounded-4 shadow-sm bg-white h-100">
                     <h4 class="fw-bold mb-2" style="color: var(--c4);">Envíanos un mensaje</h4>
                     <p class="text-muted small mb-4">Rellena el siguiente formulario y nuestro equipo lo revisará detalladamente.</p>
-                    
+
                     <form action="contacto.php" method="POST">
+
+                        <!-- Token CSRF: protege el formulario contra ataques Cross-Site Request Forgery -->
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold" style="color: var(--c4);">Nombre completo</label>
@@ -172,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label class="form-label small fw-bold" style="color: var(--c4);">Mensaje</label>
                                 <textarea name="mensaje" class="form-control form-contacto-input" rows="5" placeholder="Escribe aquí todos los detalles de tu consulta..." required></textarea>
                             </div>
-                            
+
                             <div class="col-12 mt-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="terminos" id="checkTerminos" required>

@@ -1,6 +1,13 @@
 <?php
 /**
  * Área privada del usuario: edición de datos personales y seguimiento de adopciones.
+ *
+ * Medidas de seguridad implementadas:
+ *  - Token CSRF vía includes/csrf.php (centralizado, igual que el resto de formularios).
+ *  - Verificación de sesión activa antes de cualquier operación.
+ *  - Sentencias preparadas PDO para todas las consultas.
+ *  - password_hash() para actualización segura de contraseña.
+ *  - Validación de formato de email con FILTER_VALIDATE_EMAIL.
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -14,28 +21,24 @@ if (!isset($_SESSION['id_usuario'])) {
 }
 
 require_once 'config/conexion.php';
-
-// Generación del Token CSRF si no existe
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+require_once 'includes/csrf.php';
 
 $id_usuario = (int)$_SESSION['id_usuario'];
 $mensaje    = '';
 
 // =========================================================================
-// LÓGICA DE ACTUALIZACIÓN DEL PERFIL (CON CSRF Y PASSWORD)
+// LÓGICA DE ACTUALIZACIÓN DEL PERFIL
 // =========================================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar_perfil'])) {
-    
-    // Validación de Token CSRF
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+
+    // 1. Validación del token CSRF usando el módulo centralizado.
+    if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
         die("Error de seguridad: Token CSRF no válido.");
     }
 
     $nuevo_nombre = trim($_POST['nombre'] ?? '');
     $nuevo_email  = trim($_POST['email']  ?? '');
-    $pass1        = $_POST['nueva_password'] ?? '';
+    $pass1        = $_POST['nueva_password']    ?? '';
     $pass2        = $_POST['confirmar_password'] ?? '';
 
     if (empty($nuevo_nombre) || empty($nuevo_email)) {
@@ -61,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar_perfil']))
             }
 
             $sql_update .= " WHERE id_usuario = :id";
-            
+
             $stmt_update = $conexion->prepare($sql_update);
             $stmt_update->execute($params);
 
@@ -69,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar_perfil']))
             $mensaje = "<div class='alert alert-success shadow-sm border-0'><i class='fas fa-check-circle me-2'></i> Perfil actualizado correctamente.</div>";
 
         } catch (Exception $e) {
-            $mensaje = "<div class='alert alert-danger shadow-sm border-0'>" . $e->getMessage() . "</div>";
+            $mensaje = "<div class='alert alert-danger shadow-sm border-0'>" . htmlspecialchars($e->getMessage()) . "</div>";
         } catch (PDOException $e) {
             error_log('[NexAdopt - Perfil/Update Error] ' . $e->getMessage());
             $mensaje = "<div class='alert alert-danger shadow-sm border-0'>Error al actualizar los datos.</div>";
@@ -78,10 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar_perfil']))
 }
 
 // =========================================================================
-// CARGA DE DATOS ACTUALES E HISTORIAL
+// CARGA DE DATOS ACTUALES E HISTORIAL DE SOLICITUDES
 // =========================================================================
 $nombre_actual = '';
 $email_actual  = '';
+$solicitudes   = [];
+
 try {
     $stmt_user = $conexion->prepare("SELECT nombre, email FROM Usuarios WHERE id_usuario = :id LIMIT 1");
     $stmt_user->execute([':id' => $id_usuario]);
@@ -92,8 +97,7 @@ try {
         $email_actual  = $usuario_data['email'];
     }
 
-    // CARGA DE SOLICITUDES: Ahora incluimos m.id_mascota para el enlace
-    $sql_solicitudes = "SELECT s.id_solicitud, s.estado_tramite, s.fecha_solicitud, 
+    $sql_solicitudes = "SELECT s.id_solicitud, s.estado_tramite, s.fecha_solicitud,
                                m.id_mascota, m.nombre AS mascota_nombre, m.foto_url
                         FROM Solicitudes_Adopcion s
                         JOIN Mascotas m ON s.id_mascota = m.id_mascota
@@ -108,12 +112,15 @@ try {
     error_log('[NexAdopt - Perfil/Load Error] ' . $e->getMessage());
 }
 
+// Generamos el token CSRF usando el módulo centralizado.
+$csrf_token = generateCsrfToken();
+
 include 'includes/header.php';
 ?>
 
 <main class="site-main py-5" style="background-color: var(--c1); min-height: 80vh;">
     <div class="container py-4">
-        
+
         <div class="row mb-4">
             <div class="col-12 text-start">
                 <h2 class="fw-bold display-6 mb-1" style="color: var(--c4);">Mi Perfil</h2>
@@ -127,7 +134,7 @@ include 'includes/header.php';
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
                     <div class="text-center mb-4">
-                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($nombre_actual) ?>&background=random&color=fff&size=128" 
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($nombre_actual) ?>&background=random&color=fff&size=128"
                              alt="Avatar" class="rounded-circle mb-3 shadow-sm" style="width: 100px; height: 100px; border: 3px solid var(--c5); object-fit: cover;">
                         <h4 class="fw-bold" style="color: var(--c4);"><?= htmlspecialchars($nombre_actual) ?></h4>
                         <span class="badge <?= (isset($_SESSION['rol']) && (int)$_SESSION['rol'] === 1) ? 'bg-dark' : 'bg-light text-muted border' ?> rounded-pill px-3 py-2 mt-1">
@@ -139,13 +146,15 @@ include 'includes/header.php';
 
                     <form action="perfil.php" method="POST">
                         <input type="hidden" name="actualizar_perfil" value="1">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                        
+
+                        <!-- Token CSRF: generado con el módulo centralizado includes/csrf.php -->
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted text-uppercase">Nombre Completo</label>
                             <input type="text" name="nombre" class="form-control bg-light border-0" value="<?= htmlspecialchars($nombre_actual) ?>" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted text-uppercase">Correo Electrónico</label>
                             <input type="email" name="email" class="form-control bg-light border-0" value="<?= htmlspecialchars($email_actual) ?>" required>
@@ -188,7 +197,7 @@ include 'includes/header.php';
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($solicitudes as $sol): 
+                                    <?php foreach ($solicitudes as $sol):
                                         $estado = $sol['estado_tramite'];
                                         $badge = match ($estado) {
                                             'Pendiente' => 'bg-warning text-dark',
@@ -196,7 +205,9 @@ include 'includes/header.php';
                                             'Rechazado' => 'bg-danger',
                                             default     => 'bg-secondary',
                                         };
-                                        $foto = !empty($sol['foto_url']) ? 'assets/img/mascotas/'.$sol['foto_url'] : 'assets/img/default-mascota.jpg';
+                                        $foto = !empty($sol['foto_url'])
+                                            ? 'assets/img/mascotas/' . $sol['foto_url']
+                                            : 'assets/img/default-mascota.jpg';
                                     ?>
                                         <tr>
                                             <td class="py-3">
@@ -214,7 +225,7 @@ include 'includes/header.php';
                                                 </span>
                                             </td>
                                             <td class="py-3 text-end">
-                                                <a href="perfil-mascota.php?id=<?= $sol['id_mascota'] ?>" 
+                                                <a href="perfil-mascota.php?id=<?= $sol['id_mascota'] ?>"
                                                    class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold">
                                                     <i class="fas fa-eye me-1"></i> Ver ficha
                                                 </a>

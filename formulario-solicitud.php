@@ -1,13 +1,22 @@
 <?php
 /**
- * Cuestionario de pre-adopción. Es la pieza más crítica del flujo de negocio,
- * ya que necesita insertar datos en dos tablas de forma atómica.
+ * Cuestionario de pre-adopción.
+ *
+ * Pieza más crítica del flujo de negocio: inserta datos en dos tablas de forma
+ * atómica (transacción) y actualiza el estado de la mascota simultáneamente.
+ *
+ * Medidas de seguridad implementadas:
+ *  - Token CSRF (includes/csrf.php) para proteger el formulario.
+ *  - Comprobación de sesión activa (requireLogin equivalente) antes de cualquier operación.
+ *  - Sentencias preparadas PDO para todas las operaciones de BD.
+ *  - Transacción (beginTransaction / commit / rollBack) para garantizar atomicidad.
  */
 
 session_start();
 require_once 'config/conexion.php';
+require_once 'includes/csrf.php';
 
-// Verificamos que el usuario esté autenticado y que nos llegue un ID de mascota válido.
+// Verificamos que el usuario esté autenticado antes de cargar nada más.
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: login.php');
     exit();
@@ -17,94 +26,98 @@ if (!isset($_GET['id_mascota']) || !ctype_digit($_GET['id_mascota'])) {
     exit();
 }
 
-// Casteamos a entero para asegurarnos de que el valor es numérico antes de usarlo.
-$id_mascota  = (int)$_GET['id_mascota'];
-$id_usuario  = (int)$_SESSION['id_usuario'];
+$id_mascota    = (int)$_GET['id_mascota'];
+$id_usuario    = (int)$_SESSION['id_usuario'];
 $mensaje_exito = '';
 $error_mensaje = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Definimos el cuestionario completo como un mapa pregunta => respuesta.
-    // Usamos el operador ?: para asegurarnos de que los campos vacíos no generen warnings.
-    $cuestionario = [
-        'Nombre'                                => $_POST['nombre']          ?? '',
-        'Apellidos'                             => $_POST['apellidos']        ?? '',
-        'Email'                                 => $_POST['email_contacto']   ?? '',
-        'Teléfono'                              => $_POST['telefono']         ?? '',
-        'DNI / NIE'                             => $_POST['dni']              ?? '',
-        'Fecha de Nacimiento'                   => $_POST['fecha_nac']        ?? '',
-        'Dirección completa'                    => $_POST['direccion']        ?? '',
-        'Estado Civil'                          => $_POST['estado_civil']     ?? '',
-        'Profesión'                             => $_POST['profesion']        ?? '',
-        '¿Eres la persona que va a adoptar?'   => $_POST['titular']          ?? '',
-        '¿Vivienda de alquiler o propiedad?'   => $_POST['vivienda_regimen'] ?? '',
-        'En alquiler: ¿Permiten animales?'     => $_POST['permiso_animales'] ?? '',
-        '¿Tipo de vivienda?'                   => $_POST['tipo_vivienda']    ?? '',
-        '¿Jardín vallado?'                     => $_POST['jardin_vallado']   ?? '',
-        '¿Dónde vivirá el animal?'             => $_POST['donde_vivira']     ?? '',
-        '¿Mudanzas recientes?'                 => $_POST['mudanzas']         ?? '',
-        '¿Plan si te mudas?'                   => $_POST['mudanza_futura']   ?? '',
-        '¿Cuántas personas viven en casa?'     => $_POST['convivientes']     ?? '',
-        '¿Niños y su trato con animales?'      => $_POST['ninos_trato']      ?? '',
-        '¿Hijos a futuro?'                     => $_POST['hijos_futuro']     ?? '',
-        '¿Bebé en camino?'                     => $_POST['bebe_plan']        ?? '',
-        '¿Plan en caso de divorcio?'           => $_POST['divorcio_plan']    ?? '',
-        '¿Estabilidad económica?'              => $_POST['estabilidad_econ'] ?? '',
-        '¿Tiempo solo?'                        => $_POST['tiempo_solo']      ?? '',
-        '¿Paseos al día?'                      => $_POST['paseos']           ?? '',
-        '¿Plan vacaciones?'                    => $_POST['vacaciones']       ?? '',
-        '¿Motivo de adopción?'                 => $_POST['motivo']           ?? '',
-        '¿Primera vez con esta especie?'       => $_POST['primera_vez']      ?? '',
-        'Gastos veterinarios imprevistos'       => $_POST['gastos_urgencia']  ?? '',
-        'Seguimiento post-adopción'             => $_POST['seguimiento']      ?? '',
-    ];
+    // 1. Validación del token CSRF: primera línea de defensa.
+    if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
+        $error_mensaje = 'Error de seguridad. Por favor, recarga la página e inténtalo de nuevo.';
+    } else {
 
-    try {
-        // Iniciamos la transacción. Si cualquier operación falla, ejecutamos rollBack
-        // para revertir todo y no dejar datos huérfanos en la BD.
-        $conexion->beginTransaction();
+        $cuestionario = [
+            'Nombre'                                => $_POST['nombre']          ?? '',
+            'Apellidos'                             => $_POST['apellidos']        ?? '',
+            'Email'                                 => $_POST['email_contacto']   ?? '',
+            'Teléfono'                              => $_POST['telefono']         ?? '',
+            'DNI / NIE'                             => $_POST['dni']              ?? '',
+            'Fecha de Nacimiento'                   => $_POST['fecha_nac']        ?? '',
+            'Dirección completa'                    => $_POST['direccion']        ?? '',
+            'Estado Civil'                          => $_POST['estado_civil']     ?? '',
+            'Profesión'                             => $_POST['profesion']        ?? '',
+            '¿Eres la persona que va a adoptar?'   => $_POST['titular']          ?? '',
+            '¿Vivienda de alquiler o propiedad?'   => $_POST['vivienda_regimen'] ?? '',
+            'En alquiler: ¿Permiten animales?'     => $_POST['permiso_animales'] ?? '',
+            '¿Tipo de vivienda?'                   => $_POST['tipo_vivienda']    ?? '',
+            '¿Jardín vallado?'                     => $_POST['jardin_vallado']   ?? '',
+            '¿Dónde vivirá el animal?'             => $_POST['donde_vivira']     ?? '',
+            '¿Mudanzas recientes?'                 => $_POST['mudanzas']         ?? '',
+            '¿Plan si te mudas?'                   => $_POST['mudanza_futura']   ?? '',
+            '¿Cuántas personas viven en casa?'     => $_POST['convivientes']     ?? '',
+            '¿Niños y su trato con animales?'      => $_POST['ninos_trato']      ?? '',
+            '¿Hijos a futuro?'                     => $_POST['hijos_futuro']     ?? '',
+            '¿Bebé en camino?'                     => $_POST['bebe_plan']        ?? '',
+            '¿Plan en caso de divorcio?'           => $_POST['divorcio_plan']    ?? '',
+            '¿Estabilidad económica?'              => $_POST['estabilidad_econ'] ?? '',
+            '¿Tiempo solo?'                        => $_POST['tiempo_solo']      ?? '',
+            '¿Paseos al día?'                      => $_POST['paseos']           ?? '',
+            '¿Plan vacaciones?'                    => $_POST['vacaciones']       ?? '',
+            '¿Motivo de adopción?'                 => $_POST['motivo']           ?? '',
+            '¿Primera vez con esta especie?'       => $_POST['primera_vez']      ?? '',
+            'Gastos veterinarios imprevistos'       => $_POST['gastos_urgencia']  ?? '',
+            'Seguimiento post-adopción'             => $_POST['seguimiento']      ?? '',
+        ];
 
-        // Paso 1: Creamos el registro principal de la solicitud con estado 'Pendiente'.
-        $sql_sol = "INSERT INTO Solicitudes_Adopcion (id_mascota, id_usuario, estado_tramite, fecha_solicitud) 
-                    VALUES (:id_mascota, :id_usuario, 'Pendiente', NOW())";
-        $stmt_sol = $conexion->prepare($sql_sol);
-        $stmt_sol->execute([
-            ':id_mascota' => $id_mascota,
-            ':id_usuario' => $id_usuario,
-        ]);
+        try {
+            // 2. Iniciamos la transacción: si cualquier operación falla, hacemos rollBack
+            //    para no dejar datos huérfanos o inconsistentes en la BD.
+            $conexion->beginTransaction();
 
-        // Recuperamos el ID de la solicitud recién creada para enlazar las respuestas.
-        $id_solicitud = (int)$conexion->lastInsertId();
-
-        // Paso 2: Insertamos cada respuesta del cuestionario asociada al ID de la solicitud.
-        // Preparamos la sentencia una sola vez fuera del bucle para optimizar el rendimiento.
-        $stmt_res = $conexion->prepare(
-            "INSERT INTO Respuestas_Adopcion (id_solicitud, pregunta, respuesta) VALUES (:id_solicitud, :pregunta, :respuesta)"
-        );
-
-        foreach ($cuestionario as $pregunta => $respuesta) {
-            $stmt_res->execute([
-                ':id_solicitud' => $id_solicitud,
-                ':pregunta'     => $pregunta,
-                ':respuesta'    => trim($respuesta),
+            // Paso 1: Registro principal de la solicitud con estado 'Pendiente'.
+            $stmt_sol = $conexion->prepare(
+                "INSERT INTO Solicitudes_Adopcion (id_mascota, id_usuario, estado_tramite, fecha_solicitud)
+                 VALUES (:id_mascota, :id_usuario, 'Pendiente', NOW())"
+            );
+            $stmt_sol->execute([
+                ':id_mascota' => $id_mascota,
+                ':id_usuario' => $id_usuario,
             ]);
+
+            $id_solicitud = (int)$conexion->lastInsertId();
+
+            // Paso 2: Inserción de respuestas del cuestionario. La sentencia se prepara
+            //         una sola vez fuera del bucle para optimizar el rendimiento.
+            $stmt_res = $conexion->prepare(
+                "INSERT INTO Respuestas_Adopcion (id_solicitud, pregunta, respuesta)
+                 VALUES (:id_solicitud, :pregunta, :respuesta)"
+            );
+            foreach ($cuestionario as $pregunta => $respuesta) {
+                $stmt_res->execute([
+                    ':id_solicitud' => $id_solicitud,
+                    ':pregunta'     => $pregunta,
+                    ':respuesta'    => trim($respuesta),
+                ]);
+            }
+
+            // Paso 3: La mascota pasa a 'En proceso' para no recibir más solicitudes.
+            $stmt_estado = $conexion->prepare(
+                "UPDATE Mascotas SET estado = 'En proceso' WHERE id_mascota = :id"
+            );
+            $stmt_estado->execute([':id' => $id_mascota]);
+
+            // Si todo fue bien, confirmamos los cambios de forma permanente.
+            $conexion->commit();
+            $mensaje_exito = 'Cuestionario completo enviado correctamente.';
+
+        } catch (PDOException $e) {
+            // Si algo falla, revertimos TODAS las operaciones de esta transacción.
+            $conexion->rollBack();
+            error_log('[NexAdopt - Solicitud Error] ' . $e->getMessage());
+            $error_mensaje = 'Ha ocurrido un error al enviar tu solicitud. Por favor, inténtalo de nuevo.';
         }
-
-        // Paso 3: Actualizamos el estado de la mascota a 'En proceso' para que
-        // no pueda recibir más solicitudes mientras se tramita esta.
-        $stmt_estado = $conexion->prepare("UPDATE Mascotas SET estado = 'En proceso' WHERE id_mascota = :id");
-        $stmt_estado->execute([':id' => $id_mascota]);
-
-        // Si todo fue bien, confirmamos los cambios en la BD.
-        $conexion->commit();
-        $mensaje_exito = 'Cuestionario completo enviado correctamente.';
-
-    } catch (PDOException $e) {
-        // Si algo falla, revertimos TODAS las operaciones de esta transacción.
-        $conexion->rollBack();
-        error_log('[NexAdopt - Solicitud Error] ' . $e->getMessage());
-        $error_mensaje = 'Ha ocurrido un error al enviar tu solicitud. Por favor, inténtalo de nuevo.';
     }
 }
 
@@ -123,6 +136,9 @@ if (!$mascota) {
     exit();
 }
 
+// Generamos el token CSRF y lo pasamos a la vista.
+$csrf_token = generateCsrfToken();
+
 include 'includes/header.php';
 ?>
 
@@ -130,7 +146,7 @@ include 'includes/header.php';
     <div class="container">
         <div class="card border-0 shadow rounded-4 p-5 bg-white">
             <h2 class="fw-bold text-brand text-center mb-5">Formulario de Pre-Adopción Detallado</h2>
-            
+
             <?php if ($mensaje_exito): ?>
                 <div class="alert alert-success text-center">
                     <h3>¡Enviado!</h3>
@@ -141,15 +157,18 @@ include 'includes/header.php';
                 <div class="alert alert-danger"><?= htmlspecialchars($error_mensaje) ?></div>
             <?php else: ?>
                 <form action="" method="POST" class="row g-4">
-                    
+
+                    <!-- Token CSRF: protege el formulario contra ataques Cross-Site Request Forgery -->
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+
                     <h5 class="border-bottom pb-2 fw-bold text-brand">1. Datos del adoptante</h5>
                     <div class="col-md-4"><label class="form-label fw-bold">Nombre</label><input type="text" name="nombre" class="form-control" required></div>
                     <div class="col-md-4"><label class="form-label fw-bold">Apellidos</label><input type="text" name="apellidos" class="form-control" required></div>
                     <div class="col-md-4"><label class="form-label fw-bold">DNI / NIE</label><input type="text" name="dni" class="form-control" required></div>
-                    
+
                     <div class="col-md-6"><label class="form-label fw-bold">Email de contacto</label><input type="email" name="email_contacto" class="form-control" required></div>
                     <div class="col-md-6"><label class="form-label fw-bold">Teléfono</label><input type="tel" name="telefono" class="form-control" required></div>
-                    
+
                     <div class="col-md-4"><label class="form-label fw-bold">Fecha Nacimiento</label><input type="date" name="fecha_nac" class="form-control" required></div>
                     <div class="col-md-4"><label class="form-label fw-bold">Estado Civil</label><input type="text" name="estado_civil" class="form-control"></div>
                     <div class="col-md-4"><label class="form-label fw-bold">Profesión</label><input type="text" name="profesion" class="form-control"></div>
