@@ -6,7 +6,6 @@
 include 'includes/header.php';
 require_once 'config/conexion.php';
 
-// Recogemos los filtros directamente del GET. Si no existen, asignamos una cadena vacía para evitar warnings.
 $f_especie = trim($_GET['especie'] ?? '');
 $f_raza    = trim($_GET['raza']    ?? '');
 $f_edad    = trim($_GET['edad']    ?? '');
@@ -16,7 +15,7 @@ $f_genero  = trim($_GET['genero']  ?? '');
 $hay_filtros = ($f_especie || $f_raza || $f_edad || $f_tamano || $f_genero);
 
 // =========================================================================
-// 1. CONSULTA DINÁMICA DE RAZAS (Para el desplegable del filtro)
+// 1. CONSULTA DINÁMICA DE RAZAS
 // =========================================================================
 $razas_disponibles = [];
 try {
@@ -30,12 +29,11 @@ try {
 // 2. CONSTRUCCIÓN DINÁMICA Y SEGURA DE LA CONSULTA CON PDO
 // =========================================================================
 
-// MODIFICACIÓN: Cambiamos "estado = 'Disponible'" por "estado != 'Adoptado'" y contamos solicitudes
-$sql_base  = "SELECT *, (SELECT COUNT(*) FROM Solicitudes_Adopcion s WHERE s.id_mascota = Mascotas.id_mascota) as total_solicitudes FROM Mascotas WHERE estado != 'Adoptado'";
+// Solo contamos solicitudes que NO estén rechazadas para el badge
+$sql_base  = "SELECT *, (SELECT COUNT(*) FROM Solicitudes_Adopcion s WHERE s.id_mascota = Mascotas.id_mascota AND s.estado_tramite != 'Rechazado') as total_solicitudes FROM Mascotas WHERE estado != 'Adoptado'";
 $where     = [];
 $params    = [];
 
-// Mapeo de los valores del formulario a los valores reales de la BD.
 $especie_map = ['perros' => 'Perro', 'gatos' => 'Gato', 'otros' => 'Otro'];
 $tamano_map  = ['pequeno' => 'Pequeño', 'mediano' => 'Mediano', 'grande' => 'Grande'];
 
@@ -55,12 +53,10 @@ if ($f_tamano !== '' && isset($tamano_map[$f_tamano])) {
 }
 
 if ($f_genero !== '') {
-    // ucfirst convierte 'macho' a 'Macho' para que coincida con el valor de la BD.
     $where[]          = "sexo = :genero";
     $params[':genero'] = ucfirst($f_genero);
 }
 
-// El filtro de edad requiere condiciones compuestas, por lo que usamos un bloque CASE.
 if ($f_edad !== '') {
     if ($f_edad === 'cachorro') {
         $where[] = "(edad_unidad = 'días' OR edad_unidad = 'meses' OR (edad_unidad = 'años' AND edad_valor < 1))";
@@ -71,7 +67,6 @@ if ($f_edad !== '') {
     }
 }
 
-// Construimos la query final uniendo los fragmentos WHERE con AND.
 if (!empty($where)) {
     $sql_base .= ' AND ' . implode(' AND ', $where);
 }
@@ -205,10 +200,9 @@ try {
                         </div>
                     <?php else: ?>
                         <?php foreach ($mascotas_filtradas as $mascota): 
-                            // MODIFICACIÓN: Lógica de badges de estado
                             $es_en_proceso = ($mascota['estado'] === 'En proceso' || $mascota['total_solicitudes'] > 0);
                             $badge_class = $es_en_proceso ? 'bg-warning text-dark' : 'bg-success text-white';
-                            $badge_text = $es_en_proceso ? 'En trámite' : 'Disponible';
+                            $badge_text  = $es_en_proceso ? 'En trámite' : 'Disponible';
                         ?>
                             <div class="col">
                                 <div class="card h-100 shadow-sm rounded-4 border-0 card-nexadopt position-relative overflow-hidden">

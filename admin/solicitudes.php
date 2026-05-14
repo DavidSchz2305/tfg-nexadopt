@@ -22,12 +22,10 @@ if (isset($_GET['accion'], $_GET['id_solicitud'], $_GET['id_mascota'])) {
     $id_sol   = (int)$_GET['id_solicitud'];
     $id_mas   = (int)$_GET['id_mascota'];
 
-    // Solo procesamos acciones válidas para evitar manipulaciones.
     if (in_array($accion, ['aprobar', 'rechazar'], true) && $id_sol > 0 && $id_mas > 0) {
 
         try {
             if ($accion === 'aprobar') {
-                // Envolvemos las operaciones en una transacción atómica
                 $conexion->beginTransaction();
 
                 $stmt_apro = $conexion->prepare(
@@ -40,7 +38,6 @@ if (isset($_GET['accion'], $_GET['id_solicitud'], $_GET['id_mascota'])) {
                 );
                 $stmt_adop->execute([':id_mas' => $id_mas]);
 
-                // Rechazamos las demás solicitudes de esta mascota para mantener la coherencia.
                 $stmt_rech_resto = $conexion->prepare(
                     "UPDATE Solicitudes_Adopcion SET estado_tramite = 'Rechazado' 
                      WHERE id_mascota = :id_mas AND id_solicitud != :id_sol"
@@ -51,10 +48,30 @@ if (isset($_GET['accion'], $_GET['id_solicitud'], $_GET['id_mascota'])) {
                 $mensaje_info = '<div class="alert alert-success">Solicitud aprobada con éxito. La mascota ha pasado a estado "Adoptado".</div>';
 
             } elseif ($accion === 'rechazar') {
+                $conexion->beginTransaction();
+
                 $stmt_rech = $conexion->prepare(
                     "UPDATE Solicitudes_Adopcion SET estado_tramite = 'Rechazado' WHERE id_solicitud = :id"
                 );
                 $stmt_rech->execute([':id' => $id_sol]);
+
+                // Verificamos si quedan solicitudes pendientes para esta mascota
+                $stmt_check = $conexion->prepare(
+                    "SELECT COUNT(*) FROM Solicitudes_Adopcion 
+                     WHERE id_mascota = :id_mas AND estado_tramite = 'Pendiente'"
+                );
+                $stmt_check->execute([':id_mas' => $id_mas]);
+                $pendientes_restantes = (int)$stmt_check->fetchColumn();
+
+                // Si no quedan pendientes, la mascota vuelve a Disponible
+                if ($pendientes_restantes === 0) {
+                    $stmt_disponible = $conexion->prepare(
+                        "UPDATE Mascotas SET estado = 'Disponible' WHERE id_mascota = :id_mas AND estado != 'Adoptado'"
+                    );
+                    $stmt_disponible->execute([':id_mas' => $id_mas]);
+                }
+
+                $conexion->commit();
                 $mensaje_info = '<div class="alert alert-secondary">Solicitud movida a rechazadas.</div>';
             }
 
@@ -73,13 +90,10 @@ if (isset($_GET['accion'], $_GET['id_solicitud'], $_GET['id_mascota'])) {
 // =========================================================================
 $filtros_validos = ['Todos', 'Pendiente', 'Aprobado', 'Rechazado'];
 
-
 $filtro_get = $_GET['filtro'] ?? 'Todos';
 
-// Validamos contra la lista blanca
 $filtro = in_array($filtro_get, $filtros_validos) ? $filtro_get : 'Todos';
 
-// Construimos la cláusula WHERE solo si hay un filtro activo distinto de "Todos".
 $sql_solicitudes = "SELECT s.*, m.nombre AS nombre_mascota, m.foto_url, 
                            u.nombre AS nombre_usuario, u.email AS email_usuario
                     FROM Solicitudes_Adopcion s
@@ -189,7 +203,6 @@ include '../includes/header_admin.php';
                             <div class="row g-2 p-3 bg-light rounded-3 border">
                                 <h6 class="fw-bold small text-muted mb-3 text-uppercase">Cuestionario de Pre-Adopción Detallado:</h6>
                                 <?php
-                                // MODIFICACIÓN CLAVE: Consulta directa a la base de datos por cada solicitud
                                 $stmt_r = $conexion->prepare("SELECT pregunta, respuesta FROM Respuestas_Adopcion WHERE id_solicitud = ?");
                                 $stmt_r->execute([$id_s]);
                                 $respuestas_solicitud = $stmt_r->fetchAll(PDO::FETCH_ASSOC);
