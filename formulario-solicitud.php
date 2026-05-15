@@ -6,10 +6,10 @@
  * atómica (transacción) y actualiza el estado de la mascota simultáneamente.
  *
  * Medidas de seguridad implementadas:
- *  - Token CSRF (includes/csrf.php) para proteger el formulario.
- *  - Comprobación de sesión activa (requireLogin equivalente) antes de cualquier operación.
- *  - Sentencias preparadas PDO para todas las operaciones de BD.
- *  - Transacción (beginTransaction / commit / rollBack) para garantizar atomicidad.
+ * - Token CSRF (includes/csrf.php) para proteger el formulario.
+ * - Comprobación de sesión activa (requireLogin equivalente) antes de cualquier operación.
+ * - Sentencias preparadas PDO para todas las operaciones de BD.
+ * - Transacción (beginTransaction / commit / rollBack) para garantizar atomicidad.
  */
 
 session_start();
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
 
         $cuestionario = [
-            'Nombre'                                => $_POST['nombre']          ?? '',
+            'Nombre'                                => $_POST['nombre']           ?? '',
             'Apellidos'                             => $_POST['apellidos']        ?? '',
             'Email'                                 => $_POST['email_contacto']   ?? '',
             'Teléfono'                              => $_POST['telefono']         ?? '',
@@ -158,7 +158,6 @@ include 'includes/header.php';
             <?php else: ?>
                 <form action="" method="POST" class="row g-4">
 
-                    <!-- Token CSRF: protege el formulario contra ataques Cross-Site Request Forgery -->
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
                     <h5 class="border-bottom pb-2 fw-bold text-brand">1. Datos del adoptante</h5>
@@ -170,39 +169,89 @@ include 'includes/header.php';
                     <div class="col-md-6"><label class="form-label fw-bold">Teléfono</label><input type="tel" name="telefono" class="form-control" required></div>
 
                     <div class="col-md-4"><label class="form-label fw-bold">Fecha Nacimiento</label><input type="date" name="fecha_nac" class="form-control" required></div>
-                    <div class="col-md-4"><label class="form-label fw-bold">Estado Civil</label><input type="text" name="estado_civil" class="form-control"></div>
-                    <div class="col-md-4"><label class="form-label fw-bold">Profesión</label><input type="text" name="profesion" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label fw-bold">Estado Civil</label><input type="text" name="estado_civil" class="form-control" required></div>
+                    <div class="col-md-4"><label class="form-label fw-bold">Profesión</label><input type="text" name="profesion" class="form-control" required></div>
                     <div class="col-12"><label class="form-label fw-bold">Dirección y Código Postal</label><input type="text" name="direccion" class="form-control" required></div>
-                    <div class="col-12"><label class="form-label fw-bold">¿Eres la persona que va a adoptar al animal?</label><select name="titular" class="form-select"><option>Sí</option><option>No</option></select></div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">¿Eres la persona que va a adoptar al animal?</label>
+                        <select name="titular" class="form-select" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="Sí">Sí</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
 
                     <h5 class="border-bottom pb-2 fw-bold text-brand mt-5">2. Preguntas sobre el entorno</h5>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Vivienda de alquiler o propiedad?</label><select name="vivienda_regimen" class="form-select"><option>Propiedad</option><option>Alquiler</option></select></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Tipo de vivienda?</label><input type="text" name="tipo_vivienda" class="form-control" placeholder="Piso, Chalet..."></div>
-                    <div class="col-12"><label class="form-label fw-bold">En alquiler: ¿Permiten animales?</label><input type="text" name="permiso_animales" class="form-control"></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Exterior vallado?</label><select name="jardin_vallado" class="form-select"><option>Sí</option><option>No</option><option>N/A</option></select></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Dónde vivirá el animal?</label><input type="text" name="donde_vivira" class="form-control"></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Mudanzas recientes?</label><input type="text" name="mudanzas" class="form-control"></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Plan si te mudas?</label><input type="text" name="mudanza_futura" class="form-control"></div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">¿Vivienda de alquiler o propiedad?</label>
+                        <select name="vivienda_regimen" class="form-select" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="Propiedad">Propiedad</option>
+                            <option value="Alquiler">Alquiler</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6"><label class="form-label fw-bold">¿Tipo de vivienda?</label><input type="text" name="tipo_vivienda" class="form-control" placeholder="Piso, Chalet..." required></div>
+                    <div class="col-12"><label class="form-label fw-bold">En alquiler: ¿Permiten animales?</label><input type="text" name="permiso_animales" class="form-control" required></div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">¿Exterior vallado?</label>
+                        <select name="jardin_vallado" class="form-select" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="Sí">Sí</option>
+                            <option value="No">No</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6"><label class="form-label fw-bold">¿Dónde vivirá el animal?</label><input type="text" name="donde_vivira" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label fw-bold">¿Mudanzas recientes?</label><input type="text" name="mudanzas" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label fw-bold">¿Plan si te mudas?</label><input type="text" name="mudanza_futura" class="form-control" required></div>
 
                     <h5 class="border-bottom pb-2 fw-bold text-brand mt-5">3. Familia y Convivencia</h5>
-                    <div class="col-md-4"><label class="form-label fw-bold">¿Cuántas personas viven?</label><input type="number" name="convivientes" class="form-control" min="1"></div>
-                    <div class="col-md-8"><label class="form-label fw-bold">¿Hay niños y conocen el trato animal?</label><input type="text" name="ninos_trato" class="form-control"></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Hijos a futuro?</label><input type="text" name="hijos_futuro" class="form-control"></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Bebé en camino?</label><input type="text" name="bebe_plan" class="form-control"></div>
-                    <div class="col-12"><label class="form-label fw-bold">¿Plan en caso de separación/divorcio?</label><textarea name="divorcio_plan" class="form-control"></textarea></div>
+                    <div class="col-md-4"><label class="form-label fw-bold">¿Cuántas personas viven?</label><input type="number" name="convivientes" class="form-control" min="1" required></div>
+                    <div class="col-md-8"><label class="form-label fw-bold">¿Hay niños y conocen el trato animal?</label><input type="text" name="ninos_trato" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label fw-bold">¿Hijos a futuro?</label><input type="text" name="hijos_futuro" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label fw-bold">¿Bebé en camino?</label><input type="text" name="bebe_plan" class="form-control" required></div>
+                    <div class="col-12"><label class="form-label fw-bold">¿Plan en caso de separación/divorcio?</label><textarea name="divorcio_plan" class="form-control" required></textarea></div>
 
                     <h5 class="border-bottom pb-2 fw-bold text-brand mt-5">4. Ocupación y Tiempo libre</h5>
-                    <div class="col-md-4"><label class="form-label fw-bold">¿Estabilidad económica?</label><select name="estabilidad_econ" class="form-select"><option>Sí</option><option>No</option></select></div>
-                    <div class="col-md-4"><label class="form-label fw-bold">¿Tiempo solo al día?</label><input type="text" name="tiempo_solo" class="form-control"></div>
-                    <div class="col-md-4"><label class="form-label fw-bold">¿Paseos diarios?</label><input type="number" name="paseos" class="form-control" min="0"></div>
-                    <div class="col-12"><label class="form-label fw-bold">¿Qué harás en vacaciones?</label><textarea name="vacaciones" class="form-control"></textarea></div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">¿Estabilidad económica?</label>
+                        <select name="estabilidad_econ" class="form-select" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="Sí">Sí</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4"><label class="form-label fw-bold">¿Tiempo solo al día?</label><input type="text" name="tiempo_solo" class="form-control" required></div>
+                    <div class="col-md-4"><label class="form-label fw-bold">¿Paseos diarios?</label><input type="number" name="paseos" class="form-control" min="0" required></div>
+                    <div class="col-12"><label class="form-label fw-bold">¿Qué harás en vacaciones?</label><textarea name="vacaciones" class="form-control" required></textarea></div>
 
                     <h5 class="border-bottom pb-2 fw-bold text-brand mt-5">5. Responsabilidad</h5>
-                    <div class="col-12"><label class="form-label fw-bold">¿Motivo de la adopción?</label><textarea name="motivo" class="form-control"></textarea></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Primera vez con la especie?</label><select name="primera_vez" class="form-select"><option>Sí</option><option>No</option></select></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Tienes otros animales?</label><input type="text" name="otros_animales" class="form-control"></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Asumirías urgencias veterinarias?</label><select name="gastos_urgencia" class="form-select"><option>Sí</option><option>No</option></select></div>
-                    <div class="col-md-6"><label class="form-label fw-bold">¿Aceptas seguimiento post-adopción?</label><select name="seguimiento" class="form-select"><option>Sí</option><option>No</option></select></div>
+                    <div class="col-12"><label class="form-label fw-bold">¿Motivo de la adopción?</label><textarea name="motivo" class="form-control" required></textarea></div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">¿Primera vez con la especie?</label>
+                        <select name="primera_vez" class="form-select" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="Sí">Sí</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6"><label class="form-label fw-bold">¿Tienes otros animales?</label><input type="text" name="otros_animales" class="form-control" required></div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">¿Asumirías urgencias veterinarias?</label>
+                        <select name="gastos_urgencia" class="form-select" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="Sí">Sí</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">¿Aceptas seguimiento post-adopción?</label>
+                        <select name="seguimiento" class="form-select" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="Sí">Sí</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
 
                     <div class="col-12 mt-5 text-center">
                         <button type="submit" class="btn btn-nexadopt btn-lg px-5 shadow-sm fw-bold">
