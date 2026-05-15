@@ -3,11 +3,11 @@
  * Registro de nuevos usuarios en la plataforma.
  *
  * Medidas de seguridad implementadas:
- *  - Token CSRF (includes/csrf.php) para proteger el formulario.
- *  - Verificación de unicidad del email antes del INSERT.
- *  - password_hash() con algoritmo BCRYPT (PASSWORD_DEFAULT) para almacenar credenciales.
- *  - Validación mínima de longitud de contraseña (8 caracteres).
- *  - Rol 2 asignado por defecto (usuario estándar); los admin solo se crean desde el panel.
+ * - Token CSRF (includes/csrf.php) para proteger el formulario.
+ * - Verificación de unicidad del email antes del INSERT.
+ * - password_hash() con algoritmo BCRYPT (PASSWORD_DEFAULT) para almacenar credenciales.
+ * - Validación mínima de longitud de contraseña (8 caracteres).
+ * - Rol 2 asignado por defecto (usuario estándar); los admin solo se crean desde el panel.
  */
 
 session_start();
@@ -38,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($nombre) || empty($apellidos) || empty($email) || empty($password)) {
             $mensaje = '<div class="alert alert-danger">Por favor, rellena todos los campos obligatorios.</div>';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) { 
+            $mensaje = '<div class="alert alert-danger">Por favor, introduce una dirección de correo electrónico válida.</div>';
         } elseif ($password !== $password_conf) {
             $mensaje = '<div class="alert alert-danger">Las contraseñas no coinciden.</div>';
         } elseif (strlen($password) < 8) {
@@ -98,7 +100,6 @@ include 'includes/header.php';
 
                         <form action="registro.php" method="POST">
 
-                            <!-- Token CSRF: protege el formulario contra ataques Cross-Site Request Forgery -->
                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
                             <div class="row">
